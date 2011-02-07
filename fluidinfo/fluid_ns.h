@@ -1,5 +1,6 @@
 #include <generic_stuff.h>
 
+
 /*@@ TODO: operator[int], operator[string] to get namespace by index or string, put some methods in the base impl */
 class fluidinfo::Namespace
 {
