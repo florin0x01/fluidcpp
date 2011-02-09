@@ -6,22 +6,22 @@ class fluidinfo::Object
 {
 	public:
 		Object() { }
-		Object(string name):_name(name) { }
+		Object(std::string name):_name(name) { }
 		~Object() { }
 
-		void set(string about="") { _about = about; }
-		void delete(string tag);
+		void set(std::string about="") { _about = about; }
+		void delete(std::string tag);
 
 		bool commit(); //commits to Fluidinfo
 
 	protected:
-		string _name;
-		string _about;
-		string _id;
-		string _uri;
+		std::string _name;
+		std::string _about;
+		std::string _id;
+		std::string _uri;
 
-		map<string,string> _tagMap; //tag name, tag value
-		vector<string> _tagPaths;
+		std::map<string,string> _tagMap; //tag name, tag value
+		std::vector<string> _tagPaths;
 
 		bool dirty; //if object is out of sync with Fluidinfo
 };

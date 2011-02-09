@@ -6,17 +6,17 @@ namespace fluidinfo{
 	class User{
 		public:
 			User() { }
-			User(string name):_name(name) { }
+			User(std::string name):_name(name) { }
 			~User(); //cannot delete user if autoCommit is on/off :)
-			void set(string name) { _name = name; }
+			void set(std::string name) { _name = name; }
 			void setAutoCommit(bool value) { autoCommit = value; }
 			bool commit();
 			void setSecurity(security &, categories categ);
 			void getSecurity(security &, categories categ);
 	
 		protected:
-			string _name;
-			string _id;	
+			std::string _name;
+			std::string _id;	
 			bool dirty;
 			bool autoCommit;
 			security _securityObj;	

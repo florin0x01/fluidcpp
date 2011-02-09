@@ -10,15 +10,15 @@ namespace fluidinfo{
 	{
 		public:
 			Namespace() { _name=""; }
-			Namespace(string name,string description=""):_name(name),_description(description) { }
+			Namespace(std::string name,std::string description=""):_name(name),_description(description) { }
 			~Namespace() { } //if autoCommit is true, call del() ?
 
-			void set(string name, string description="") { _name = name; _description=description; }
+			void set(std::string name, std::string description="") { _name = name; _description=description; }
 			void setAutoCommit(bool value) { autoCommit = value; }
 
-			string getName() { return _name; }
-			string getDescription() { return _description; }
-			vector<Namespace*> getNamespaces(bool returnDescription="", bool returnTags="");
+			std::string getName() { return _name; }
+			std::string getDescription() { return _description; }
+			std::vector<Namespace*> getNamespaces(bool returnDescription="", bool returnTags="");
 
 			bool commit(); //commits to Fluidinfo				
 			void getSecurity(security&, categories categ);
@@ -26,10 +26,10 @@ namespace fluidinfo{
 			void del();
 
 		protected:
-			string _name;
-			string _description;
-			vector<Namespace*> _vns;
-			vector<string> _tagNames;
+			std::string _name;
+			std::string _description;
+			std::vector<Namespace*> _vns;
+			std::vector<string> _tagNames;
 		
 			security _securityObj;
 		

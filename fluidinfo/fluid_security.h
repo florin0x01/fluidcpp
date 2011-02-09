@@ -10,7 +10,7 @@ namespace fluidinfo{
 	struct security {
 		permissions perms;
 		policy pol;
-		set<string> exceptions;
+		std::set<string> exceptions;
 	}
 }
 #endif
