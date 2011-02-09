@@ -1,3 +1,5 @@
+#ifndef _FLUID_USER_
+#define _FLUID_USER_
 #include <generic_stuff.h>
 
 namespace fluidinfo{
@@ -20,3 +22,4 @@ namespace fluidinfo{
 			security _securityObj;	
 	};
 }
+#endif

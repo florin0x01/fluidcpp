@@ -1,3 +1,6 @@
+#ifndef _FLUID_NS_
+#define _FLUID_NS_
+
 #include <generic_stuff.h>
 #include "fluid_security.h"
 
@@ -35,3 +38,4 @@ namespace fluidinfo{
 		
 	}; 
 }
+#endif

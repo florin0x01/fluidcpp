@@ -1,3 +1,5 @@
+#ifndef _FLUID_SECURITY_
+#define _FLUID_SECURITY_
 #include <generic_stuff.h>
 
 namespace fluidinfo{
@@ -11,3 +13,4 @@ namespace fluidinfo{
 		set<string> exceptions;
 	}
 }
+#endif

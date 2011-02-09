@@ -1,3 +1,5 @@
+#ifndef _FLUID_OBJECT_
+#define _FLUID_OBJECT_
 #include <generic_stuff.h>
 
 class fluidinfo::Object
@@ -23,3 +25,4 @@ class fluidinfo::Object
 
 		bool dirty; //if object is out of sync with Fluidinfo
 };
+#endif
