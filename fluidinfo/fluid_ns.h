@@ -4,14 +4,16 @@
 #include <generic_stuff.h>
 #include "fluid_security.h"
 
+
+
 /*@@ TODO: operator[int], operator[string] to get namespace by index or string, put some methods in the base impl */
 namespace fluidinfo{
 	class Namespace
 	{
 		public:
-			Namespace() { _name=""; }
+			Namespace() { _name=""; dirty = true; }
 			Namespace(std::string name,std::string description=""):_name(name),_description(description) { }
-			~Namespace() { } //if autoCommit is true, call del() ?
+			virtual ~Namespace(); //if autoCommit is true, call del() ?
 
 			void set(std::string name, std::string description="") { _name = name; _description=description; }
 			void setAutoCommit(bool value) { autoCommit = value; }
@@ -35,7 +37,14 @@ namespace fluidinfo{
 		
 			bool autoCommit;
 			bool dirty; //if object is out of sync with Fluidinfo
+			
+			bool _returnNamespaceDescription;
+			bool _returnTagsDescription;
 		
 	}; 
+	
+	enum NS_States {
+	    
+	};
 }
 #endif
