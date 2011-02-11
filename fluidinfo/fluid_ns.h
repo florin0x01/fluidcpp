@@ -8,7 +8,7 @@
 
 /*@@ TODO: operator[int], operator[string] to get namespace by index or string, put some methods in the base impl */
 namespace fluidinfo{
-	class Namespace
+	class Namespace: public Session
 	{
 		public:
 			Namespace() { _name=""; dirty = true; }
@@ -40,11 +40,23 @@ namespace fluidinfo{
 			
 			bool _returnNamespaceDescription;
 			bool _returnTagsDescription;
+			
+			
+			enum NS_States {
+			    STATE_ZERO = 0,
+			    STATE_GETNAME = 1,
+			    STATE_GETDESCRIPTION = 2,
+			    STATE_GETNAMESPACES_DESC = 4,
+			    STATE_GETNAMESPACES_TAGS = 16,
+			    STATE_GETSECURITY = 32,
+			    STATE_SETSECURITY = 64
+			}; 
+			
+			NS_States state;
+			
 		
 	}; 
 	
-	enum NS_States {
-	    
-	};
+	
 }
 #endif

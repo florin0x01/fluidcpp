@@ -11,6 +11,11 @@ namespace fluidinfo{
 		permissions perms;
 		policy pol;
 		std::set<string> exceptions;
-	}
+	};
+	
+	struct authentication {
+	      std::string username;
+	      std:::string password;
+	};
 }
 #endif

@@ -8,4 +8,8 @@
 #include <map>
 #include <vector>
 
+/** CURL stuff **/
+
+#include <curl/curl.h>
+
 #endif

@@ -3,7 +3,7 @@
 #include <generic_stuff.h>
 
 namespace fluidinfo{
-	class User{
+	class User: public Session{
 		public:
 			User() { }
 			User(std::string name):_name(name) { }
@@ -16,10 +16,18 @@ namespace fluidinfo{
 	
 		protected:
 			std::string _name;
-			std::string _id;	
+			std::string _id;
 			bool dirty;
 			bool autoCommit;
 			security _securityObj;	
+			
+			enum USER_States {
+			    STATE_ZERO = 0,
+			    STATE_SETSECURITY = 1,
+			    STATE_GETSECURITY = 2
+			};
+			
+			USER_States state;
 	};
 }
 #endif
