@@ -1,9 +1,12 @@
 #ifndef _FLUID_USER_
 #define _FLUID_USER_
-#include <generic_stuff.h>
+
+#include "generic_stuff.h"
+#include "fluid_security.h"
+#include "fluid_session_details.h"
 
 namespace fluidinfo{
-	class User: public Session{
+	class User: public SessionDetails{
 		public:
 			User() { }
 			User(std::string name):_name(name) { }
@@ -11,7 +14,7 @@ namespace fluidinfo{
 			void set(std::string name) { _name = name; }
 			void setAutoCommit(bool value) { autoCommit = value; }
 			bool commit();
-			void setSecurity(security &, categories categ);
+			void setSecurity(security , categories categ);
 			void getSecurity(security &, categories categ);
 	
 		protected:
@@ -27,7 +30,8 @@ namespace fluidinfo{
 			    STATE_GETSECURITY = 2
 			};
 			
-			USER_States state;
+			vector<USER_States> stateVector;
+			map<int, security> securityMap;
 	};
 }
 #endif

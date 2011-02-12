@@ -1,14 +1,14 @@
 #ifndef _FLUID_NS_
 #define _FLUID_NS_
 
-#include <generic_stuff.h>
+#include "generic_stuff.h"
 #include "fluid_security.h"
-
+#include "fluid_session_details.h"
 
 
 /*@@ TODO: operator[int], operator[string] to get namespace by index or string, put some methods in the base impl */
 namespace fluidinfo{
-	class Namespace: public Session
+	class Namespace: public SessionDetails
 	{
 		public:
 			Namespace() { _name=""; dirty = true; }

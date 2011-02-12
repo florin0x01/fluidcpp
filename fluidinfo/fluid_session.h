@@ -5,6 +5,8 @@
 #include "fluid_security.h"
 
 namespace fluidinfo{
+  
+  class SessionDetails;
 
   class Session {
       public :
@@ -39,8 +41,10 @@ namespace fluidinfo{
 	    bool CURLInitialized;
 	    bool sandboxMode;
 	    
-	    CURL *curl;
+	    CURLM *curl_box;
 	    CURLcode curl_res;
+	    
+	    friend class SessionDetails;
 	    
   };
   

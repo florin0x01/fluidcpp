@@ -12,4 +12,7 @@
 
 #include <curl/curl.h>
 
+#define FLUID_HTTP_SSL "https://fluiddb.fluidinfo.com"
+#define FLUID_HTTP "http://fluiddb.fluidinfo.com"
+
 #endif
