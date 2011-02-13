@@ -28,9 +28,13 @@ class Session;
 		    curl_easy_setopt(handle, CURLOPT_URL, FLUID_HTTP_SSL);
 		    curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 0L); //skip peer verification
 		    curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 0L); //do not verify host
+		    
+		    mainURL = FLUID_HTTP_SSL;
 		  }
-		  else
+		  else {
 		    curl_easy_setopt(handle, CURLOPT_URL, FLUID_HTTP);
+		    mainURL = FLUID_HTTP;
+		  }
 		  
 		  curl_multi_add_handle(parentSession->curl_box, handle);
 		  
@@ -42,6 +46,8 @@ class Session;
 	      bool _SSL;
 	      bool _sandbox;
 	      bool _init;
+	      
+	      std::string mainURL;
 	      
 	      Session* parentSession;
     };

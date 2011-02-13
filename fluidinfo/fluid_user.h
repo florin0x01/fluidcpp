@@ -11,11 +11,24 @@ namespace fluidinfo{
 			User() { }
 			User(std::string name):_name(name) { }
 			~User(); //cannot delete user if autoCommit is on/off :)
-			void set(std::string name) { _name = name; }
+			void set(std::string name) { 
+			    if ( autoCommit == true )
+			    {
+			      state = STATE_NAME;
+			      commit();
+			      return;
+			    }
+			    
+			    _name = name;
+			  
+			}
 			void setAutoCommit(bool value) { autoCommit = value; }
 			bool commit();
-			void setSecurity(security , categories categ);
-			void getSecurity(security &, categories categ);
+			void setSecurity(security , categories categ, std::string xpath);
+			
+			void getSecurity(security &, categories categ, std::string xpath);
+			string getName() { return _name; }
+			string getId() { return _id; }
 	
 		protected:
 			std::string _name;
@@ -24,14 +37,20 @@ namespace fluidinfo{
 			bool autoCommit;
 			security _securityObj;	
 			
+			bool doState(USER_States state);
+			
 			enum USER_States {
 			    STATE_ZERO = 0,
-			    STATE_SETSECURITY = 1,
-			    STATE_GETSECURITY = 2
+			    STATE_NAME = 1,
+			    STATE_SETSECURITY = 2,
+			    STATE_GETSECURITY = 3
 			};
 			
-			vector<USER_States> stateVector;
-			map<int, security> securityMap;
+			std::vector<USER_States> stateVector;
+			std::map<categories, security> securityMap;
+			std::map<categories, std::string> xpathMap;
+			std::map<std::string, categories> reverse_xpathMap;
+			USER_States state;
 	};
 }
 #endif
