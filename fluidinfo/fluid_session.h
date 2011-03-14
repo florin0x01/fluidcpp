@@ -37,6 +37,7 @@ namespace fluidinfo{
 	    std::string _name;
 	    authentication AuthObj;
 	    
+
 	    bool SSL;
 	    bool CURLInitialized;
 	    bool sandboxMode;

@@ -25,6 +25,12 @@ bool fluidinfo::Session::start() {
 		 curl_easy_setopt(curl, CURLOPT_URL, "http://fluiddb.fluidinfo.com");
 	       */
 	       
+	       /**
+		* 	enum permissions { CREATE,UPDATE,DELETE,LIST,CONTROL };
+	enum policy { OPEN, CLOSED };
+	enum categories { NS, TAGS, TAGVALUES };*/
+	       
+
 	       return true;
   
 }

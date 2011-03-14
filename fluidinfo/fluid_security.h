@@ -1,6 +1,6 @@
 #ifndef _FLUID_SECURITY_
 #define _FLUID_SECURITY_
-#include <generic_stuff.h>
+#include "generic_stuff.h"
 
 namespace fluidinfo{
 	enum permissions { CREATE,UPDATE,DELETE,LIST,CONTROL };
@@ -10,12 +10,12 @@ namespace fluidinfo{
 	struct security {
 		permissions perms;
 		policy pol;
-		std::set<string> exceptions;
+		std::set<std::string> exceptions;
 	};
 	
 	struct authentication {
 	      std::string username;
-	      std:::string password;
+	      std::string password;
 	};
 }
 #endif
