@@ -10,15 +10,17 @@ namespace fluidinfo{
 {
 	public:
 		Object() { }
-		Object(std::string name):_name(name) { }
+		explicit Object(std::string name):_name(name) { }
 		~Object() { }
+
+		void create();
 
 		void set(std::string about="") { _about = about; }
 		void setName(std::string name) { _name = name; }
-		void delTag(std::string tag);
-		bool hasTag(std::string tag);
-		void putTag(std::string tag);
-		void create();
+		void delTag(std::string tag) { }
+		bool hasTag(std::string tag) { }
+		void putTag(std::string tag) { }
+		
 		void getByTag(std::string tag);
 		std::string getURI() { return _uri; }
 		std::string getId() { return _id; }

@@ -13,23 +13,35 @@ namespace fluidinfo{
 	    Session():CURLInitialized(false),_name(""),SSL(false),sandboxMode(false) { 
 		
 	    }*/
-	    Session(std::string name="", authentication* auth=NULL):_name(name), AuthObj(*auth),SSL(false),sandboxMode(false) { 
+	    explicit Session(std::string name="", authentication* auth=NULL):_name(name),SSL(false),sandboxMode(false) { 
 	      CURLInitialized = false; 
-	      
+	      if ( auth != NULL )
+		      AuthObj = *auth;
 	    }
-	    ~Session() { 
+	    virtual ~Session() { 
 	      if ( CURLInitialized == true && curl_box) {
 		  curl_global_cleanup();
 		  curl_box = NULL;
 	      }
 	    }
-	    void setAuthentication(const authentication& auth) { AuthObj = auth;  } 
-	    void setName(std::string name="") { _name = name; }
-	    void setSSL(bool _ssl=true) { SSL = _ssl; }
-	    void setSandbox(bool sandbox=true) { sandboxMode = sandbox; }
-	    CURLM* curl_multi_handle() const { return curl_box; }
+	    inline void setAuthentication(const authentication& auth) { AuthObj = auth;  } 
+	    inline void setName(std::string name="") { _name = name; }
+	    inline void setSSL(bool _ssl=true) { SSL = _ssl; }
+	    inline void setSandbox(bool sandbox=true) { sandboxMode = sandbox; }
+	    inline CURLM* curl_multi_handle() const { return curl_box; }
 	    
-	    bool Start();
+	   inline bool Start() {
+		 curl_res = curl_global_init(CURL_GLOBAL_ALL);
+	       
+	       if  ( curl_res ) 
+		 return false;
+	       
+	       curl_box = curl_multi_init();
+	       if (!curl_box)
+		 return false; 
+	       
+	       return true;
+	    }
 	    authentication AuthObj;
 	    
       protected:

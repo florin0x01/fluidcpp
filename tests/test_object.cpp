@@ -24,14 +24,15 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	
-	/*
+	
 	Object myObj("Nini");
 	myObj.setParentSession(&session);
 	myObj.create();
+	myObj.hasTag("gigi");
 	myObj.update();
 	
 	cout << "Object id: " << myObj.getId() << endl;
 	cout << "Object URI: " << myObj.getURI() << endl;
-	*/
+	
 	return 0;
 }

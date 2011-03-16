@@ -2,6 +2,7 @@
 
 using namespace std;
 
+
 void fluidinfo::Object::create()
 {
 
@@ -43,6 +44,7 @@ bool fluidinfo::Object::hasTag(string tag)
   init();
   curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWhasTag);
   curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+  return true;
 }
 
 

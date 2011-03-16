@@ -38,7 +38,7 @@ public:
 
 protected:
 
-    void init() {
+   inline void init() {
 
         //User classes must call init() each time they do a request...
 
