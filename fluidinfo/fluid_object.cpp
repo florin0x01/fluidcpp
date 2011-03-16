@@ -8,7 +8,7 @@ void fluidinfo::Object::create()
   init();
   
   string url = mainURL;
-  string doc;
+  string doc = "";
   
   url = url + "/objects";
   
@@ -24,14 +24,14 @@ void fluidinfo::Object::create()
   
   if ( _about != "" ) {
     root["about"] = _about;  
+    doc = writer.write(root);
+    if ( root == Json::nullValue )
+     doc = "";  
   }
-  
-   doc = writer.write(root);
-   if ( root == Json::nullValue )
-     doc = "";
-   
+ 
    //or set CURLOPT_POSTFIELDSIZE to 0?!!
-   curl_easy_setopt(handle, CURLOPT_POSTFIELDS, (char*)doc.c_str());
+   if ( doc != "" )
+	curl_easy_setopt(handle, CURLOPT_POSTFIELDS, (char*)doc.c_str());
   
   //get the info back
   //_uri = ?

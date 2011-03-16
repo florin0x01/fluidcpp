@@ -20,6 +20,8 @@ namespace fluidinfo{
 		void putTag(std::string tag);
 		void create();
 		void getByTag(std::string tag);
+		std::string getURI() { return _uri; }
+		std::string getId() { return _id; }
 
 	protected:
 		std::string _name;

@@ -10,6 +10,9 @@
 #include <vector>
 #include <stdarg.h>
 
+#include <sys/types.h>
+#include <sys/time.h>
+
 /** JSON stuff **/
 
 #include <json/autolink.h>

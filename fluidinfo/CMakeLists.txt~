@@ -1,0 +1,2 @@
+project (FluidInfo)
+add_subdirectory(tests)

@@ -1,6 +1,6 @@
 #include "fluid_session.h"
 
-bool fluidinfo::Session::start() {
+bool fluidinfo::Session::Start() {
 	       curl_res = curl_global_init();
 	       
 	       if  ( curl_res ) 
