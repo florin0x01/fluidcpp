@@ -2,6 +2,22 @@
 
 using namespace std;
 
+size_t XXX(void* ptr, size_t size, size_t nmemb, void* p)
+{
+cout << "I'm here " << endl;
+  fluidinfo::Object *x = (fluidinfo::Object*)p;
+  size_t recsize = size * nmemb;
+  if  ( recsize ) {
+    char *buf = new char[recsize+1];
+    memset(buf,0,sizeof(x));
+    memcpy(buf, ptr, recsize);
+  //#ifdef FLUID_DEBUG
+	cout << "FWCreate(): " << buf << endl;
+  //#endif
+    delete[] buf;
+  }
+  return recsize;	
+}
 
 void fluidinfo::Object::create()
 {
@@ -13,15 +29,30 @@ void fluidinfo::Object::create()
   
   url = url + "/objects";
   
+  cout << "Url is " << url << endl;
+  
+  CURLcode c;
+  
   curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-  curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWcreate);
-  curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+  FILE *t = fdopen(1, "wt");
+  if ( t == NULL )
+	  cout << "Fail " << endl;
+  c = curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, NULL);
+  if ( c != CURLE_OK ) 
+	  cout << "WRITEFUNCTION failed: " << c << endl;
+  
+  
+  c = curl_easy_setopt(handle, CURLOPT_WRITEDATA, t);
+  if  ( c != CURLE_OK )
+	cout << "WRITEDATA failed: " << c << endl;
+  
+  
   curl_easy_setopt(handle, CURLOPT_POST, 1);
   
   dirty = true;
 
   Json::Value root;
-  Json::Writer writer;
+  Json::StyledWriter writer;
   
   if ( _about != "" ) {
     root["about"] = _about;  
@@ -29,10 +60,14 @@ void fluidinfo::Object::create()
     if ( root == Json::nullValue )
      doc = "";  
   }
+  
+  cout << "Will write " << doc << endl;
  
    //or set CURLOPT_POSTFIELDSIZE to 0?!!
    if ( doc != "" )
 	curl_easy_setopt(handle, CURLOPT_POSTFIELDS, (char*)doc.c_str());
+   else
+	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, 0);
   
   //get the info back
   //_uri = ?
@@ -67,15 +102,17 @@ void fluidinfo::Object::getByTag(string tag)
 
 size_t fluidinfo::Object::FWcreate(void* ptr, size_t size, size_t nmemb, void* p)
 {
-  fluidinfo::Object *x = p;
+
+	cout << "I'm here " << endl;
+  fluidinfo::Object *x = (fluidinfo::Object*)p;
   size_t recsize = size * nmemb;
   if  ( recsize ) {
     char *buf = new char[recsize+1];
     memset(buf,0,sizeof(x));
     memcpy(buf, ptr, recsize);
-  #ifdef FLUID_DEBUG
+  //#ifdef FLUID_DEBUG
 	cout << "FWCreate(): " << buf << endl;
-  #endif
+  //#endif
     delete[] buf;
   }
   return recsize;
@@ -84,26 +121,26 @@ size_t fluidinfo::Object::FWcreate(void* ptr, size_t size, size_t nmemb, void* p
 
 size_t fluidinfo::Object::FWdelTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
-  fluidinfo::Object *x = p;
+   fluidinfo::Object *x = (fluidinfo::Object*)p;
 }
 
 size_t fluidinfo::Object::FWhasTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
-  fluidinfo::Object *x = p;
+   fluidinfo::Object *x = (fluidinfo::Object*)p;
 }
 
 size_t fluidinfo::Object::FWputTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
-  fluidinfo::Object *x = p;
+   fluidinfo::Object *x = (fluidinfo::Object*)p;
 }
 
 size_t fluidinfo::Object::FWgetByTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
-  fluidinfo::Object *x = p;
+   fluidinfo::Object *x = (fluidinfo::Object*)p;
 }
 
 size_t fluidinfo::Object::FWsetName(void* ptr, size_t size, size_t nmemb, void* p)
 {
-  fluidinfo::Object *x = p;
+   fluidinfo::Object *x = (fluidinfo::Object*)p;
 }
 

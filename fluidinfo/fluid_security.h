@@ -3,7 +3,10 @@
 #include "generic_stuff.h"
 
 namespace fluidinfo{
-	enum permissions { CREATE,UPDATE,DELETE,LIST,CONTROL };
+	
+	
+	enum permissions { CREATE,UPDATE,DELETE,LIST,CONTROL } ;
+		
 	enum policy { OPEN, CLOSED };
 	enum categories { NS, TAGS, TAGVALUES };
 
@@ -17,5 +20,7 @@ namespace fluidinfo{
 	      std::string username;
 	      std::string password;
 	};
+	
+
 }
 #endif

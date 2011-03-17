@@ -5,7 +5,10 @@
 #include "fluid_security.h"
 #include "fluid_session_details.h"
 
+static size_t XXX(void *ptr, size_t size, size_t nmemb, void* p);
+
 namespace fluidinfo{
+	
   class Object: public SessionDetails
 {
 	public:
@@ -15,10 +18,10 @@ namespace fluidinfo{
 
 		void create();
 
-		void set(std::string about="") { _about = about; }
+		void isAbout(std::string about="") { _about = about; }
 		void setName(std::string name) { _name = name; }
 		void delTag(std::string tag) { }
-		bool hasTag(std::string tag) { }
+		bool hasTag(std::string tag);
 		void putTag(std::string tag) { }
 		
 		void getByTag(std::string tag);

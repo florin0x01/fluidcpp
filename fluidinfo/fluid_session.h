@@ -3,7 +3,7 @@
 
 #include "generic_stuff.h"
 #include "fluid_security.h"
-#include "fluid_session_details.h"
+//#include "fluid_session_details.h"
 
 namespace fluidinfo{
   

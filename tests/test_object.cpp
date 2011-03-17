@@ -1,6 +1,6 @@
-#include "fluidinfo/fluid_object.h"
-#include "fluidinfo/fluid_session.h"
-#include "fluidinfo/fluid_session_details.h"
+#include "fluid_object.h"
+#include "fluid_session.h"
+#include "fluid_session_details.h"
 
 #include <iostream>
 
@@ -11,6 +11,7 @@ int main(int argc, char** argv)
 {
 	Session session;
 
+	
 	authentication auth;
 	auth.password = "testfluidinfo";
 	auth.username = "nfpetrovici";
@@ -27,6 +28,7 @@ int main(int argc, char** argv)
 	
 	Object myObj("Nini");
 	myObj.setParentSession(&session);
+	myObj.isAbout("Nini");
 	myObj.create();
 	myObj.hasTag("gigi");
 	myObj.update();
