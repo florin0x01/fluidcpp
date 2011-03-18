@@ -33,4 +33,8 @@
 
 #define FLUID_DEBUG  1
 
+//based on javascript encodeURIComponent()
+std::string char2hex( char dec );
+std::string urlencode(const std::string &c);
+
 #endif

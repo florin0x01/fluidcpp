@@ -52,7 +52,7 @@ void fluidinfo::Object::create()
   dirty = true;
 
   Json::Value root;
-  Json::StyledWriter writer;
+  Json::FastWriter writer;
   
   if ( _about != "" ) {
     root["about"] = _about;  
@@ -60,12 +60,16 @@ void fluidinfo::Object::create()
     if ( root == Json::nullValue )
      doc = "";  
   }
+ 
+ urlencode(doc);
   
-  cout << "Will write " << doc << endl;
+  cout << "Will write " << endl << (char*)doc.c_str() << endl;
  
    //or set CURLOPT_POSTFIELDSIZE to 0?!!
-   if ( doc != "" )
+   if ( doc != "" ) {
 	curl_easy_setopt(handle, CURLOPT_POSTFIELDS, (char*)doc.c_str());
+	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, doc.size()); 
+   }
    else
 	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, 0);
   

@@ -28,9 +28,11 @@ int main(int argc, char** argv)
 	
 	Object myObj("Nini");
 	myObj.setParentSession(&session);
-	myObj.isAbout("Nini");
+	string about;
+	cout << "About: " ;cin>>about;
+	myObj.isAbout(about);
 	myObj.create();
-	myObj.hasTag("gigi");
+//	myObj.hasTag("gigi");
 	myObj.update();
 	
 	cout << "Object id: " << myObj.getId() << endl;

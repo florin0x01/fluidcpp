@@ -63,7 +63,7 @@ void fluidinfo::SessionDetails::init()
         handle = curl_easy_init();
         curl_slist_free_all(http_headers);
         http_headers = NULL;
-        http_headers = curl_slist_append(http_headers, "application/json");
+        http_headers = curl_slist_append(http_headers, "Content-Type: application/json");
     }
 
     if ( _SSL == true ) {
@@ -78,8 +78,10 @@ void fluidinfo::SessionDetails::init()
         mainURL = FLUID_HTTP;
     }
 
+    curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(handle, CURLOPT_USERPWD, parentSession->AuthObj.password.c_str());
+    std::string ugly_user_pwd = parentSession->AuthObj.username + ":" + parentSession->AuthObj.password;
+    curl_easy_setopt(handle, CURLOPT_USERPWD, ugly_user_pwd.c_str());
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, http_headers);
 
     //only add curl handle if we have a real "new" connection and make _init=true
