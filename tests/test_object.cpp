@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	session.setAuthentication(auth);
 	session.setName("testSession");
 	session.setSandbox(false);
-	session.setSSL(true);
+	session.setSSL(false);
 	
 	if ( session.Start() == false ) {
 		cout << "Could not start session :( " << endl;
@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 	}
 	
 	
-	Object myObj("Nini");
+	Object myObj("Londra");
 	myObj.setParentSession(&session);
 	string about;
 	cout << "About: " ;cin>>about;

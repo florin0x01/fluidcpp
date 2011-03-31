@@ -27,11 +27,24 @@
 /** CURL stuff **/
 
 #include <curl/curl.h>
+#include <stdlib.h>
+#include <auto_ptr.h>
 
 #define FLUID_HTTP_SSL "https://fluiddb.fluidinfo.com"
 #define FLUID_HTTP "http://fluiddb.fluidinfo.com"
 
 #define FLUID_DEBUG  1
+
+template<class T_>
+struct auto_vec{
+  T_* t_;
+  auto_vec( T_* t ): t_( t ) {}
+  ~auto_vec() { delete[] t_; }
+  T_* get() const { return t_; }
+  T_* operator->() const { return get(); }
+  T_& operator*() const { return *get(); }
+  /* you should also define operator=, reset and release, if you plan to use them */
+};
 
 //based on javascript encodeURIComponent()
 std::string char2hex( char dec );

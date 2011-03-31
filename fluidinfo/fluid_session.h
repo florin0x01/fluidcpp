@@ -21,6 +21,7 @@ namespace fluidinfo{
 	    virtual ~Session() { 
 	      if ( CURLInitialized == true && curl_box) {
 		  curl_global_cleanup();
+		  //memory leak
 		  curl_box = NULL;
 	      }
 	    }

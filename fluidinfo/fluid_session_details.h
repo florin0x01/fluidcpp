@@ -14,6 +14,10 @@ public:
         _init=false;
         connections++;
 	std::cout << "Initializing SessionDetails() " << std::endl;
+	
+	initpermissionsMap();
+	initpolicyMap();
+	initcategoriesMap();
     }
 
     virtual ~SessionDetails() {

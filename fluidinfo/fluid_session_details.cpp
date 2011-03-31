@@ -99,8 +99,8 @@ void fluidinfo::SessionDetails::update()
     FD_ZERO(&write_set);
     FD_ZERO(&exc_set);
 
-    /** Wait up to 2 seconds **/
-    select_timeout.tv_sec = 2;
+    /** Wait up to 1 seconds **/
+    select_timeout.tv_sec = 1;
     select_timeout.tv_usec = 0;
 
     long int timeout_ms = 0;
