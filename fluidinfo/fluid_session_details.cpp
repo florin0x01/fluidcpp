@@ -47,24 +47,15 @@ std::vector<std::string>& fluidinfo::SessionDetails::initcategoriesMap() {
     }
 }
 
-void fluidinfo::SessionDetails::init()
+void fluidinfo::SessionDetails::init(bool multi)
 {
 
     //User classes must call init() each time they do a request...
 
-    /*
-      if ( _init )
-          return;
-    */
-
-
-    if ( _init == false ) {
-
-        handle = curl_easy_init();
-        curl_slist_free_all(http_headers);
-        http_headers = NULL;
-        http_headers = curl_slist_append(http_headers, "Content-Type: application/json");
-    }
+    handle = curl_easy_init();
+    curl_slist_free_all(http_headers);
+    http_headers = curl_slist_append(http_headers, "Content-Type: application/json");
+    
 
     if ( _SSL == true ) {
         curl_easy_setopt(handle, CURLOPT_URL, FLUID_HTTP_SSL);
@@ -84,12 +75,15 @@ void fluidinfo::SessionDetails::init()
     curl_easy_setopt(handle, CURLOPT_USERPWD, ugly_user_pwd.c_str());
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, http_headers);
 
-    //only add curl handle if we have a real "new" connection and make _init=true
-    if ( _init == false ) {
-        curl_multi_add_handle(parentSession->curl_multi_handle(), handle);
-        _init = true;
+    //each time add a new different curl handle
+   
+    if ( multi == true ) {
+	curl_multi_add_handle(parentSession->curl_multi_handle(), handle);
+	_init = true;
 	std::cout << "Adding curl easy handle " << handle << std::endl;
     }
+    
+    //we can put an update() call here based on a flag?!
 }
 
 void fluidinfo::SessionDetails::update()

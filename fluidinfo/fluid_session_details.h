@@ -43,7 +43,7 @@ public:
 
 protected:
 
-	void init();
+    void init(bool multi=true);
 	
     CURL *handle;
     bool _SSL;

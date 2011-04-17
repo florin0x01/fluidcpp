@@ -21,15 +21,16 @@ namespace fluidinfo{
 		void isAbout(std::string about="") { _about = about; }
 		void setName(std::string name) { _name = name; }
 		void delTag(std::string tag) { }
-		bool hasTag(std::string tag);
-		void putTag(std::string tag) { }
+		bool hasTag(const std::string& tag);
+		void putTag(const std::string& tag);
 		
 		std::string getTagValue(std::string tag);
 		std::vector<std::string> getTagPaths(bool cached=false);
 		std::string getURI() { return _uri; }
 		std::string getId() { return _id; }
 		
-		static std::vector<std::string>& getIdsByQuery(std::string query);
+		//this should be static somehow...
+		void getIdsByQuery(const std::string& query);
 		
 		static std::vector<std::string> ids;
 
@@ -38,8 +39,6 @@ namespace fluidinfo{
 		std::string _about;
 		std::string _id;
 		std::string _uri;
-		
-		void Cleanup();
 		
 		static size_t FWsetName(void *ptr, size_t size, size_t nmemb,void* p);
 		static size_t FWdelTag(void* ptr, size_t size, size_t nmemb, void* p);
@@ -52,7 +51,6 @@ namespace fluidinfo{
 		
 		std::map<std::string,std::string> _tagMap; //tag name, tag value
 		std::vector<std::string> _tagPaths;
-		std::vector<char**> cleanupVector;
 		
 		bool dirty; //if object is out of sync with Fluidinfo
 };
