@@ -26,14 +26,16 @@ int main(int argc, char** argv)
 	}
 	
 	
-	Object myObj("Londra");
+	Object myObj("TestObj");
 	myObj.setParentSession(&session);
 	string about;
-	cout << "About: " ;cin>>about;
+	cout << "About: " ;
+	cin>>about;
 	myObj.isAbout(about);
 	myObj.create();
-//	myObj.hasTag("gigi");
 	myObj.update();
+//	myObj.hasTag("gigi");
+	myObj.putTag("gigi","", "gigivalue");
 	
 	cout << "Object id: " << myObj.getId() << endl;
 	cout << "Object URI: " << myObj.getURI() << endl;

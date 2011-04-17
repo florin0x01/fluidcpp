@@ -13,16 +13,22 @@ public:
         _sandbox=false;
         _init=false;
         connections++;
+	http_headers = NULL;
 	std::cout << "Initializing SessionDetails() " << std::endl;
 	
-	initpermissionsMap();
-	initpolicyMap();
-	initcategoriesMap();
+	handles.reserve(1000);
+	
+	//SEGFAULT here?
+	//permissionsMap();
+	//policyMap();
+	//categoriesMap();
     }
 
     virtual ~SessionDetails() {
-        curl_multi_remove_handle(parentSession->curl_multi_handle(), handle);
-        curl_easy_cleanup(handle);
+	for ( int i = 0; i < handles.size(); i++) {
+	   curl_multi_remove_handle(parentSession->curl_multi_handle(), handles[i]);
+	   curl_easy_cleanup(handles[i]);
+	}
         if (http_headers) {
             curl_slist_free_all(http_headers);
             http_headers = NULL;
@@ -43,9 +49,12 @@ public:
 
 protected:
 
-    void init(bool multi=true);
-	
-    CURL *handle;
+    void init(bool multi=true, const std::string& headers="Content-Type: application/json");
+	   
+    std::vector<CURL*> handles;
+    
+    CURL *const Handle() { return handles[handles.size()-1]; }
+    
     bool _SSL;
     bool _sandbox;
     bool _init;
@@ -63,20 +72,16 @@ protected:
     Session* parentSession;
     
     static int connections;
-    static curl_slist* http_headers;
+    curl_slist* http_headers;
     
-    static std::vector<std::string> permissionsMap;
-    static std::vector<std::string> categoriesMap;
-    static std::vector<std::string> policyMap;
+    static std::vector<std::string>& permissionsMap();
+    static std::vector<std::string>& policyMap();
+    static std::vector<std::string>& categoriesMap();
     
-    static std::vector<std::string>& initpermissionsMap();
-    static std::vector<std::string>& initpolicyMap();
-    static std::vector<std::string>& initcategoriesMap();
+private:
+	CURL *handle;
 };
 
-    std::vector<std::string> fluidinfo::SessionDetails::permissionsMap;
-    std::vector<std::string> fluidinfo::SessionDetails::categoriesMap;
-    std::vector<std::string> fluidinfo::SessionDetails::policyMap;
 }
 
 #endif

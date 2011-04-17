@@ -28,6 +28,7 @@
 
 #include <curl/curl.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <auto_ptr.h>
 
 #define FLUID_HTTP_SSL "https://fluiddb.fluidinfo.com"

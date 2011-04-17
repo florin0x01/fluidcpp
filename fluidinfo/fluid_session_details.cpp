@@ -4,57 +4,79 @@
 #include <errno.h>
 
 int fluidinfo::SessionDetails::connections = 0;
-curl_slist* fluidinfo::SessionDetails::http_headers = NULL;
+//curl_slist* fluidinfo::SessionDetails::http_headers = NULL;
 
-std::vector< std::string >& fluidinfo::SessionDetails::initpermissionsMap()
+std::vector< std::string >& fluidinfo::SessionDetails::permissionsMap()
 {
 
-    static bool first = true;
+    static volatile bool first = true;
+    static std::vector<std::string> _permissionsMap;
+  
 
     if ( first ) {
-        fluidinfo::SessionDetails::permissionsMap[CREATE] = "create";
-        fluidinfo::SessionDetails::permissionsMap[UPDATE] = "update";
-        fluidinfo::SessionDetails::permissionsMap[DELETE] = "delete";
-        fluidinfo::SessionDetails::permissionsMap[LIST] = "list";
-        fluidinfo::SessionDetails::permissionsMap[CONTROL] = "control";
+        _permissionsMap[CREATE] = "create";
+        _permissionsMap[UPDATE] = "update";
+        _permissionsMap[DELETE] = "delete";
+        _permissionsMap[LIST] = "list";
+        _permissionsMap[CONTROL] = "control";
 
 	first = false;
 
     }
+    
+    return _permissionsMap;
 
 }
 
-std::vector<std::string>& fluidinfo::SessionDetails::initpolicyMap() {
+std::vector<std::string>& fluidinfo::SessionDetails::policyMap() {
     static bool first = true;
+    
+    static std::vector<std::string> _policyMap;
 
     if ( first ) {
-        fluidinfo::SessionDetails::policyMap[OPEN] = "open";
-        fluidinfo::SessionDetails::policyMap[CLOSED] = "closed";
+        _policyMap[OPEN] = "open";
+        _policyMap[CLOSED] = "closed";
 	first = false;
     }
+    
+    return _policyMap;
 }
 
-std::vector<std::string>& fluidinfo::SessionDetails::initcategoriesMap() {
+std::vector<std::string>& fluidinfo::SessionDetails::categoriesMap() {
     static bool first = true;
+ 
+    static std::vector<std::string> _categoriesMap;
 
     if ( first ) {
 
-        fluidinfo::SessionDetails::categoriesMap[NS] = "namespaces";
-        fluidinfo::SessionDetails::categoriesMap[TAGS] = "tags";
-        fluidinfo::SessionDetails::categoriesMap[TAGVALUES] = "tag-values";
+        _categoriesMap[NS] = "namespaces";
+        _categoriesMap[TAGS] = "tags";
+        _categoriesMap[TAGVALUES] = "tag-values";
 	
 	first = false;
     }
+    
+    return _categoriesMap;
 }
 
-void fluidinfo::SessionDetails::init(bool multi)
+void fluidinfo::SessionDetails::init(bool multi, const std::string& headers)
 {
 
     //User classes must call init() each time they do a request...
-
+ 
+    /*** START CRITICAL SECTION ***/
     handle = curl_easy_init();
-    curl_slist_free_all(http_headers);
-    http_headers = curl_slist_append(http_headers, "Content-Type: application/json");
+    handles.push_back(handle);
+    
+    handle = handles[handles.size()-1];
+    
+    //http_headers is not thread safe !
+    if ( http_headers ) {
+       curl_slist_free_all(http_headers);
+    }
+    http_headers = curl_slist_append(http_headers, headers.c_str());
+    
+    /*** END CRITICAL SECTION ***/
     
 
     if ( _SSL == true ) {
@@ -86,6 +108,7 @@ void fluidinfo::SessionDetails::init(bool multi)
     //we can put an update() call here based on a flag?!
 }
 
+//TODO: critical section
 void fluidinfo::SessionDetails::update()
 {
 
@@ -158,6 +181,12 @@ void fluidinfo::SessionDetails::update()
 		std::cout << "Received msg: " << std::endl;
 		std::cout << "Message type: " << msg->msg << std::endl;
 		std::cout << "CURL easy handle: " << msg->easy_handle << std::endl;
+		
+		//CRITICAL SECTION !
+	
+		//curl_multi_remove_handle(parentSession->curl_multi_handle(), msg->easy_handle);
+		//curl_easy_cleanup(msg->easy_handle);
+		
 		std::cout << "CURL result : " << msg->data.result << std::endl;
 		std::cout << strerror(errno) << std::endl;
 		//std::cout << "Data: " << (msg->data.whatever?(char*)msg->data.whatever:"") << std::endl;

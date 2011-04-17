@@ -1,9 +1,10 @@
 #include "fluid_object.h"
-#include <boost/concept_check.hpp>
+//#include <boost/concept_check.hpp>
 
 using namespace std;
 
 std::vector<std::string> fluidinfo::Object::ids;
+std::vector<FILE*> fluidinfo::Object::openFiles;
 
 void fluidinfo::Object::create()
 {
@@ -19,19 +20,19 @@ void fluidinfo::Object::create()
   
   CURLcode c;
   
-  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(Handle(), CURLOPT_URL, url.c_str());
  
-  c = curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWcreate);
+  c = curl_easy_setopt(Handle(), CURLOPT_WRITEFUNCTION, FWcreate);
   if ( c != CURLE_OK ) 
 	  cout << "WRITEFUNCTION failed: " << c << endl;
   
   
-  c = curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+  c = curl_easy_setopt(Handle(), CURLOPT_WRITEDATA, this);
   if  ( c != CURLE_OK )
 	cout << "WRITEDATA failed: " << c << endl;
   
   
-  curl_easy_setopt(handle, CURLOPT_POST, 1);
+  curl_easy_setopt(Handle(), CURLOPT_POST, 1);
   
   dirty = true;
 
@@ -61,11 +62,11 @@ void fluidinfo::Object::create()
  
    //or set CURLOPT_POSTFIELDSIZE to 0?!!
    if ( doc != "" ) {
-	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, (long)strlen(doc.c_str())); 
-	curl_easy_setopt(handle, CURLOPT_COPYPOSTFIELDS, doc.c_str());
+	curl_easy_setopt(Handle(), CURLOPT_POSTFIELDSIZE, (long)strlen(doc.c_str())); 
+	curl_easy_setopt(Handle(), CURLOPT_COPYPOSTFIELDS, doc.c_str());
    }
    else
-	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, 0);
+	curl_easy_setopt(Handle(), CURLOPT_POSTFIELDSIZE, 0);
   
   
    
@@ -78,14 +79,14 @@ std::vector<std::string> fluidinfo::Object::getIdsByQuery(const string& query)
 {
 	ids.clear();
 	
-	init(); //easy handling only
+	init();
 	string url = mainURL;
 	
 	url = url + "/objects?query=" + urlencode(query);
-	curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
-	curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWgetIdsByQuery);
-	curl_easy_setopt(handle, CURLOPT_WRITEDATA, NULL);
+	curl_easy_setopt(Handle(), CURLOPT_HTTPGET, 1);
+	curl_easy_setopt(Handle(), CURLOPT_URL, url.c_str());
+	curl_easy_setopt(Handle(), CURLOPT_WRITEFUNCTION, FWgetIdsByQuery);
+	curl_easy_setopt(Handle(), CURLOPT_WRITEDATA, NULL);
 	
 	update();
 	return this->ids;
@@ -97,9 +98,9 @@ bool fluidinfo::Object::hasTag(const string& tag)
   string url = mainURL;
   url = url + "/objects/" + _id + "/" + tag;
   
-  curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWhasTag);
-  curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
-  curl_easy_setopt(handle, CURLOPT_NOBODY, 1); //for HEAD requests
+  curl_easy_setopt(Handle(), CURLOPT_WRITEFUNCTION, FWhasTag);
+  curl_easy_setopt(Handle(), CURLOPT_WRITEDATA, this);
+  curl_easy_setopt(Handle(), CURLOPT_NOBODY, 1); //for HEAD requests
   
   update();
   
@@ -121,10 +122,10 @@ vector< string > fluidinfo::Object::getTagPaths(bool cached)
 	string url = mainURL;
 	url = url + "/objects/" + _id;
 	
-	curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
-	curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWgetTagPaths);
-	curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+	curl_easy_setopt(Handle(), CURLOPT_HTTPGET, 1);
+	curl_easy_setopt(Handle(), CURLOPT_URL, url.c_str());
+	curl_easy_setopt(Handle(), CURLOPT_WRITEFUNCTION, FWgetTagPaths);
+	curl_easy_setopt(Handle(), CURLOPT_WRITEDATA, this);
 	
 	update();
 	
@@ -151,10 +152,10 @@ string fluidinfo::Object::getTagValue(string tag)
   
   url = url + "/objects/" + _id + "/" + tag;
   
-  curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
-  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-  curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWgetTagValue);
-  curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+  curl_easy_setopt(Handle(), CURLOPT_HTTPGET, 1);
+  curl_easy_setopt(Handle(), CURLOPT_URL, url.c_str());
+  curl_easy_setopt(Handle(), CURLOPT_WRITEFUNCTION, FWgetTagValue);
+  curl_easy_setopt(Handle(), CURLOPT_WRITEDATA, this);
   
   update();
   
@@ -165,7 +166,7 @@ string fluidinfo::Object::getTagValue(string tag)
 	
 }
 
-void fluidinfo::Object::putTag(const std::string& tagPath, const std::string& tag)
+void fluidinfo::Object::delTag(const std::string& tag, const std::string& tagPath)
 {
 	init();
 	
@@ -173,35 +174,98 @@ void fluidinfo::Object::putTag(const std::string& tagPath, const std::string& ta
 	  return;
 	
 	string url = mainURL;
-	string doc = "";
 	
-	url = url + "/objects/" + _id + "/" + tagPath;
+	if ( !tagPath.empty() )
+		url = url + "/objects/" + _id + "/" + tagPath + "/" + tag;
+	else
+		url = url + "/objects/" + _id + "/" + tag;
 	
-	curl_easy_setopt(handle, CURLOPT_PUT, 1);
-	curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWputTag);
-	curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+	curl_easy_setopt(Handle(), CURLOPT_CUSTOMREQUEST, delete_request.c_str());
 	
-	//set CURLOPT_READDATA and CURLOPT_READFUNCTION
-	if ( doc != "" ) {
-	/*
-	    curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, (long)strlen(doc.c_str())); 
-	    curl_easy_setopt(handle, CURLOPT_COPYPOSTFIELDS, doc.c_str())
-	    */;
-	}
-	//else
-	  //  curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, 0);
-  
 	update();
 	
-	Json::Value root;
-	Json::FastWriter writer;
-	
-	root = tag;
-	
-	doc = writer.write(root);
-	
+	return;
+}
+
+void fluidinfo::Object::put(const std::string& tagPath, const std::string& tag, const std::string& filePath)
+{
+     if ( filePath.empty() )
+	   return;
+     
+     if ( tag == "" )
+	   return;
+     
+     string url = mainURL;
+     
+     if ( !tagPath.empty() )
+		url = url + "/objects/" + _id + "/" + tagPath + "/" + tag;
+     else
+		url = url + "/objects/" + _id + "/" + tag;
+     
+     //TODO: use boost
+     //get file extension
 		
+     size_t idx = filePath.find(".");
+     string extension = "txt";
+     
+     if ( idx != std::string::npos ) {
+	try {
+		extension = filePath.substr(idx+1);
+	}catch(...) {
+		extension = "txt";
+	}
+     }
+     
+     //get file size
+     //critical section
+     unsigned long fileSize;
+     FILE* f = fopen(filePath.c_str(), "rb");
+     fseek(f, 0L, SEEK_SET);
+     fseek(f, 0L, SEEK_END);
+     
+     fileSize = ftell(f);
+     fseek(f, 0L, SEEK_SET);
+     
+     openFiles.push_back(f);
+	
+     init(true, "Content-Type: application/" + extension);
+     
+     curl_easy_setopt(Handle(), CURLOPT_UPLOAD, 1);
+     curl_easy_setopt(Handle(), CURLOPT_URL, url.c_str());
+
+     curl_easy_setopt(Handle(), CURLOPT_READFUNCTION, FWputBlob);
+     curl_easy_setopt(Handle(), CURLOPT_READDATA, openFiles[openFiles.size()-1]);
+     curl_easy_setopt(Handle(), CURLOPT_INFILESIZE, fileSize);
+     
+     //update();
+}
+
+void fluidinfo::Object::putTag(const std::string& tag, const std::string& tagPath, const std::string& value)
+{
+	//set the Content Type to primitive value
+	init(true, "Content-Type: application/vnd.fluiddb.value+json");
+	
+	if ( tag == "" )
+	  return;
+	
+	string url = mainURL;
+	string doc = "";
+	
+	if ( !tagPath.empty() )
+		url = url + "/objects/" + _id + "/" + tagPath + "/" + tag;
+	else
+		url = url + "/objects/" + _id + "/" + tag;
+	
+	long valueSize = value.size();
+	
+	curl_easy_setopt(Handle(), CURLOPT_UPLOAD, 1);
+	curl_easy_setopt(Handle(), CURLOPT_URL, url.c_str());
+
+	curl_easy_setopt(Handle(), CURLOPT_READFUNCTION, FWputTag);
+	curl_easy_setopt(Handle(), CURLOPT_READDATA, value.c_str());
+	curl_easy_setopt(Handle(), CURLOPT_INFILESIZE, valueSize);
+	  
+	update();
 	
 	return;
 }
@@ -288,10 +352,11 @@ size_t fluidinfo::Object::FWgetTagPaths(void* ptr, size_t size, size_t nmemb, vo
    return recsize;
 }
 
+/*
 size_t fluidinfo::Object::FWdelTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
    fluidinfo::Object *x = (fluidinfo::Object*)p;
-}
+}*/
 
 size_t fluidinfo::Object::FWhasTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
@@ -301,21 +366,30 @@ size_t fluidinfo::Object::FWhasTag(void* ptr, size_t size, size_t nmemb, void* p
 	char *buf = new char[recsize+1];
 	memset(buf,0,recsize+1);
 	memcpy(buf, ptr, recsize);
+	std::cout << "buf: " << buf << std::endl;
 	delete[] buf;
    }
    return recsize;
 }
 
+size_t fluidinfo::Object::FWputBlob(void* ptr, size_t size, size_t nmemb, void* p)
+{
+   FILE* f = (FILE*)p;
+   ptr = (char*)malloc(512*sizeof(char)*1024); //512kB
+   size_t read = 0;
+   if(!feof(f))
+	 read = fread(ptr, 512*sizeof(char)*1024, 1, f);
+   else
+	 fclose(f);
+   return read;
+}
+
 size_t fluidinfo::Object::FWputTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
-   fluidinfo::Object *x = (fluidinfo::Object*)p;
-   size_t recsize = size * nmemb;
-   if ( recsize ) {
-	char *buf = new char[recsize+1];
-	memset(buf, 0 , recsize+1);
-	memcpy(buf, ptr, recsize);
-	delete[] buf;
-   }
+   const char* tag = (const char*)p;
+   size_t recsize = strlen(tag);
+   ptr = (char*)malloc(recsize+1);
+   memcpy(ptr, tag, recsize);
    return recsize;
 }
 
@@ -336,8 +410,9 @@ size_t fluidinfo::Object::FWgetTagValue(void* ptr, size_t size, size_t nmemb, vo
    return recsize;
 }
 
+/*
 size_t fluidinfo::Object::FWsetName(void* ptr, size_t size, size_t nmemb, void* p)
 {
    fluidinfo::Object *x = (fluidinfo::Object*)p;
-}
+}*/
 
