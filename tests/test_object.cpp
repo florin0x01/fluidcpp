@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	session.setAuthentication(auth);
 	session.setName("testSession");
 	session.setSandbox(false);
-	session.setSSL(false);
+	session.setSSL(true);
 	
 	if ( session.Start() == false ) {
 		cout << "Could not start session :( " << endl;
@@ -36,6 +36,7 @@ int main(int argc, char** argv)
 	myObj.update();
 //	myObj.hasTag("gigi");
 	myObj.putTag("gigi","", "gigivalue");
+	myObj.update();
 	
 	cout << "Object id: " << myObj.getId() << endl;
 	cout << "Object URI: " << myObj.getURI() << endl;

@@ -28,6 +28,7 @@ namespace fluidinfo{
 	    inline void setAuthentication(const authentication& auth) { AuthObj = auth;  } 
 	    inline void setName(std::string name="") { _name = name; }
 	    inline void setSSL(bool _ssl=true) { SSL = _ssl; }
+	    inline bool getSSL() { return SSL; }
 	    inline void setSandbox(bool sandbox=true) { sandboxMode = sandbox; }
 	    inline CURLM* curl_multi_handle() const { return curl_box; }
 	    

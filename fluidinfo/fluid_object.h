@@ -14,7 +14,7 @@ namespace fluidinfo{
 	public:
 		Object() {  }
 		explicit Object(std::string name):_name(name) { }
-		~Object() { }
+		virtual ~Object() { }
 
 		void create();
 

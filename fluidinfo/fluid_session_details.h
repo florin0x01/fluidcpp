@@ -29,10 +29,13 @@ public:
 	   curl_multi_remove_handle(parentSession->curl_multi_handle(), handles[i]);
 	   curl_easy_cleanup(handles[i]);
 	}
+	/*
+		may segfault in certain conditions
         if (http_headers) {
             curl_slist_free_all(http_headers);
             http_headers = NULL;
-        }
+        }*/
+	
         connections--;
     }
     void setSSL(bool SSL) {
@@ -43,6 +46,7 @@ public:
     }
     void setParentSession(Session *p) {
         parentSession = p;
+		setSSL(parentSession->getSSL());
     }
 
     void update();
@@ -54,6 +58,11 @@ protected:
     std::vector<CURL*> handles;
     
     CURL *const Handle() { return handles[handles.size()-1]; }
+
+    inline void printHandlesVector() {
+		for(int i=0; i < handles.size(); i++)
+			std::cout << handles[i] << std::endl;
+	}
     
     bool _SSL;
     bool _sandbox;

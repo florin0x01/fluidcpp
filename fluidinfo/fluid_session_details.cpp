@@ -66,10 +66,7 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string& headers)
  
     /*** START CRITICAL SECTION ***/
     handle = curl_easy_init();
-    handles.push_back(handle);
-    
-    handle = handles[handles.size()-1];
-    
+	
     //http_headers is not thread safe !
     if ( http_headers ) {
        curl_slist_free_all(http_headers);
@@ -100,9 +97,17 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string& headers)
     //each time add a new different curl handle
    
     if ( multi == true ) {
-	curl_multi_add_handle(parentSession->curl_multi_handle(), handle);
-	_init = true;
-	std::cout << "Adding curl easy handle " << handle << std::endl;
+		curl_multi_add_handle(parentSession->curl_multi_handle(), handle);
+		std::cout << "Obtained handle " << handle << std::endl;
+		handles.push_back(handle);
+
+		printHandlesVector();
+
+		handle = handles[handles.size()-1];
+
+		std::cout << "Handle from vector: " << handle << std::endl;
+		_init = true;
+		std::cout << "Adding curl easy handle " << handle << std::endl;
     }
     
     //we can put an update() call here based on a flag?!
@@ -131,14 +136,13 @@ void fluidinfo::SessionDetails::update()
     CURLMcode multi_perform_code;
 
     do {
-//	std::cout << "Running update () " << std::endl;
 	
         multi_perform_code = curl_multi_perform(parentSession->curl_multi_handle(), &running_handles);
 
         cres = curl_multi_fdset(parentSession->curl_multi_handle(), &read_set, &write_set, &exc_set,&maxfd);
 
-	//std::cout << "maxfd: " << maxfd << std::endl;
-
+		//if maxfd == -1 || running_handles == 0 No handles!
+		
         if ( cres!= CURLM_OK )
         {
             //TODO throw exception ?
@@ -168,8 +172,6 @@ void fluidinfo::SessionDetails::update()
             return;
         }
 
-	//std::cout << "Running handles: " << running_handles << std::endl;
-
     } while (multi_perform_code==CURLM_CALL_MULTI_PERFORM || running_handles > 0);
 
       CURLMsg *msg = NULL;
@@ -183,9 +185,6 @@ void fluidinfo::SessionDetails::update()
 		std::cout << "CURL easy handle: " << msg->easy_handle << std::endl;
 		
 		//CRITICAL SECTION !
-	
-		//curl_multi_remove_handle(parentSession->curl_multi_handle(), msg->easy_handle);
-		//curl_easy_cleanup(msg->easy_handle);
 		
 		std::cout << "CURL result : " << msg->data.result << std::endl;
 		std::cout << strerror(errno) << std::endl;
