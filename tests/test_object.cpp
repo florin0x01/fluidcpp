@@ -1,4 +1,5 @@
 #include "fluid_object.h"
+#include "fluid_ns.h"
 #include "fluid_session.h"
 #include "fluid_session_details.h"
 
@@ -29,11 +30,17 @@ int main(int argc, char** argv)
 	Object myObj("TestObj");
 	myObj.setParentSession(&session);
 	string about="gigi";
+	
+	Namespace ns("CPPnamespace2", "fluidinfo cpp namespace");
+	ns.setParentSession(&session);
+	ns.create();
+	
+	
 //	cout << "About: " ;
 //	cin>>about;
 	myObj.isAbout(about);
 	myObj.create();
-	myObj.putTag("myFirstTag", "", "myFirstTagValue");
+	myObj.putTag("myFirstTag", "CPPnamespace", "myFirstTagValue");
 
 	//myObj.hasTag("myFirstTag");
 	

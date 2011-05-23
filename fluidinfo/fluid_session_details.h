@@ -25,7 +25,8 @@ public:
 
     virtual ~SessionDetails() {
 	std::cout << "~SesssionDetails " << std::endl;
-	curl_easy_cleanup(handle);
+	if ( _init )
+	  curl_easy_cleanup(handle);
 	/*
 	for ( int i = 0; i < handles.size(); i++) {
 	   curl_multi_remove_handle(parentSession->curl_multi_handle(), handles[i]);

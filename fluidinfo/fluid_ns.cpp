@@ -8,23 +8,76 @@ fluidinfo::Namespace::~Namespace()
 }
 
 
-vector< Namespace* > fluidinfo::Namespace::getNamespaces(bool returnDescription, bool returnTags)
+vector< fluidinfo::Namespace* > fluidinfo::Namespace::getNamespaces(bool returnDescription, bool returnTags)
 {
-  _returnNamespaceDescription = returnDescription;
-  _returnTagsDescription = returnTags;
+ // _returnNamespaceDescription = returnDescription;
+ // _returnTagsDescription = returnTags;
   return _vns;
 }
 
 void fluidinfo::Namespace::create()
 {
+    init();
+  
+  string url = mainURL;
+  string doc = "";
+  
+  url = url + "/namespaces/" + parentSession->AuthObj.username;
+  
+  cout << "Url is " << url << endl;
+  
+  CURLcode c;
+  
+  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+ 
+  c = curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWcreate );
+  if ( c != CURLE_OK ) 
+	  cout << "WRITEFUNCTION failed: " << c << endl;
+  
+  
+  c = curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+  if  ( c != CURLE_OK )
+	cout << "WRITEDATA failed: " << c << endl;
+  
+  
+  curl_easy_setopt(handle, CURLOPT_POST, 1);
+  
+  Json::Value root;
+  
+  Json::FastWriter writer;
+  //Json::StyledWriter writer;
+  
+  root["description"] = _description;
+  root["name"] = _name;
+  
+  doc = writer.write(root);
+  
+  if ( root == Json::nullValue ) {
+      doc = "";
+      cout << "Null value " << endl;
+  }	
 
+   
+  cout << "Will write " << doc.c_str() << "with size " << strlen(doc.c_str()) << endl;
+  cout << "Curl handle"  << handle << endl;
+ 
+   //or set CURLOPT_POSTFIELDSIZE to 0?!!
+   if ( doc != "" ) {
+	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, (long)strlen(doc.c_str())); 
+	curl_easy_setopt(handle, CURLOPT_COPYPOSTFIELDS, doc.c_str());
+   }
+   else
+	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, 0);
+  
+  curl_easy_perform(handle);
+   
 }
 
 size_t fluidinfo::Namespace::FWcreate(void* ptr, size_t size, size_t nmemb, void* p)
 {
 
 
-  fluidinfo::Object *x = (fluidinfo::Object*)p;
+  fluidinfo::Namespace *x = (fluidinfo::Namespace*)p;
   size_t recsize = size * nmemb;
   if  ( recsize ) {
     char *buf = new char[recsize+1];
