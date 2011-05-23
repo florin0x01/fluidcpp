@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	session.setAuthentication(auth);
 	session.setName("testSession");
 	session.setSandbox(false);
-	session.setSSL(true);
+	session.setSSL(false);
 	
 	if ( session.Start() == false ) {
 		cout << "Could not start session :( " << endl;
@@ -28,15 +28,14 @@ int main(int argc, char** argv)
 	
 	Object myObj("TestObj");
 	myObj.setParentSession(&session);
-	string about;
-	cout << "About: " ;
-	cin>>about;
+	string about="gigi";
+//	cout << "About: " ;
+//	cin>>about;
 	myObj.isAbout(about);
 	myObj.create();
-	myObj.update();
-//	myObj.hasTag("gigi");
-	myObj.putTag("gigi","", "gigivalue");
-	myObj.update();
+	myObj.putTag("myFirstTag", "", "myFirstTagValue");
+
+	//myObj.hasTag("myFirstTag");
 	
 	cout << "Object id: " << myObj.getId() << endl;
 	cout << "Object URI: " << myObj.getURI() << endl;

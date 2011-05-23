@@ -11,49 +11,37 @@ namespace fluidinfo{
 	class Namespace: public SessionDetails
 	{
 		public:
-			Namespace() { _name=""; dirty = true; }
+			Namespace() { _name=""; }
 			Namespace(std::string name,std::string description=""):_name(name),_description(description) { }
-			virtual ~Namespace(); //if autoCommit is true, call del() ?
+			virtual ~Namespace();
 
 			void set(std::string name, std::string description="") { _name = name; _description=description; }
-			void setAutoCommit(bool value) { autoCommit = value; }
-
+	
 			std::string getName() { return _name; }
 			std::string getDescription() { return _description; }
 			std::vector<Namespace*> getNamespaces(bool returnDescription="", bool returnTags="");
-
-			bool commit(); //commits to Fluidinfo				
+			
 			void getSecurity(security&, categories categ);
 			void setSecurity(security&, categories categ);
 			void del();
+			void create();
 
 		protected:
 			std::string _name;
 			std::string _description;
+		
+			std::string _id;
+			std::string _uri;
+			
 			std::vector<Namespace*> _vns;
-			std::vector<string> _tagNames;
+			std::vector<std::string> _tagNames;
 		
 			security _securityObj;
-		
-			bool autoCommit;
-			bool dirty; //if object is out of sync with Fluidinfo
-			
-			bool _returnNamespaceDescription;
-			bool _returnTagsDescription;
 			
 			
-			enum NS_States {
-			    STATE_ZERO = 0,
-			    STATE_GETNAME = 1,
-			    STATE_GETDESCRIPTION = 2,
-			    STATE_GETNAMESPACES_DESC = 4,
-			    STATE_GETNAMESPACES_TAGS = 16,
-			    STATE_GETSECURITY = 32,
-			    STATE_SETSECURITY = 64
-			}; 
-			
-			NS_States state;
-			
+			//callbacks
+			static size_t FWcreate(void *ptr, size_t size, size_t nmemb, void* p);
+
 		
 	}; 
 	

@@ -5,6 +5,7 @@
 #include "fluid_security.h"
 #include "fluid_session_details.h"
 
+
 //TODO also implement /about functionality here
 
 namespace fluidinfo{
@@ -37,14 +38,20 @@ namespace fluidinfo{
 		
 		static std::vector<std::string> ids;
 
+		//should be protected
+		std::vector<std::string> _tagPaths;
+		//should be protected
+		std::map<std::string,std::string> _tagMap; //tag name, tag value
+		
 	protected:
 		std::string _name;
 		std::string _about;
 		std::string _id;
 		std::string _uri;
 		
-	//	static size_t FWsetName(void *ptr, size_t size, size_t nmemb,void* p);
-	//	static size_t FWdelTag(void* ptr, size_t size, size_t nmemb, void* p);
+		static size_t FWsetName(void *ptr, size_t size, size_t nmemb,void* p);
+		static size_t FWdelTag(void* ptr, size_t size, size_t nmemb, void* p);
+		
 		static size_t FWhasTag(void* ptr, size_t size, size_t nmemb, void* p);
 		static size_t FWputTag(void *ptr, size_t size, size_t nmemb, void* p);
 		static size_t FWputBlob(void *ptr, size_t size, size_t nmemb, void* p);
@@ -52,20 +59,15 @@ namespace fluidinfo{
 		static size_t FWgetTagValue(void *ptr, size_t size, size_t nmemb, void* p);
 		static size_t FWgetTagPaths(void *ptr, size_t size, size_t nmemb, void* p);
 		static size_t FWgetIdsByQuery(void *ptr, size_t size, size_t nmemb, void* p);
-		
-		std::map<std::string,std::string> _tagMap; //tag name, tag value
-		std::vector<std::string> _tagPaths;
+	  
 		
 		static std::vector<FILE*> openFiles;
 		
 		std::string delete_request;
+		std::string doc;
 		
 		bool dirty; //if object is out of sync with Fluidinfo
 };
 
-  struct MetaObj {
-	Object *obj;
-	std::string tagrequest;
-  };
 }
 #endif

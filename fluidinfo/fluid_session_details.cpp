@@ -59,17 +59,25 @@ std::vector<std::string>& fluidinfo::SessionDetails::categoriesMap() {
     return _categoriesMap;
 }
 
-void fluidinfo::SessionDetails::init(bool multi, const std::string& headers)
+void fluidinfo::SessionDetails::init(bool multi, const std::string headers)
 {
 
     //User classes must call init() each time they do a request...
  
     /*** START CRITICAL SECTION ***/
-    handle = curl_easy_init();
-	
+    if ( !_init ) {
+      std::cout << "Reinit() " << std::endl;
+      handle = curl_easy_init();
+    }
+    
+   // curl_easy_reset(handle);
+    
+    std::cout << "Calling init on handle " << handle << std::endl;
+    
     //http_headers is not thread safe !
     if ( http_headers ) {
        curl_slist_free_all(http_headers);
+       http_headers = NULL;
     }
     http_headers = curl_slist_append(http_headers, headers.c_str());
     
@@ -87,41 +95,46 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string& headers)
         curl_easy_setopt(handle, CURLOPT_URL, FLUID_HTTP);
         mainURL = FLUID_HTTP;
     }
-
+  
+    
     curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     std::string ugly_user_pwd = parentSession->AuthObj.username + ":" + parentSession->AuthObj.password;
     curl_easy_setopt(handle, CURLOPT_USERPWD, ugly_user_pwd.c_str());
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, http_headers);
-
-    //each time add a new different curl handle
-   
+  
     if ( multi == true ) {
-		curl_multi_add_handle(parentSession->curl_multi_handle(), handle);
-		std::cout << "Obtained handle " << handle << std::endl;
-		handles.push_back(handle);
+	if ( !_init ) {
+	  if ( curl_multi_add_handle(parentSession->curl_multi_handle(), handle) != CURLM_OK )
+	    std::cout << "Could not add handle " << std::endl;
+	  
+	  std::cout << "Obtained handle " << handle << std::endl;
 
-		printHandlesVector();
+	  std::cout << "Handle from vector: " << handle << std::endl;
+	
+	  std::cout << "Adding curl easy handle " << handle << std::endl;
+	}
 
-		handle = handles[handles.size()-1];
-
-		std::cout << "Handle from vector: " << handle << std::endl;
-		_init = true;
-		std::cout << "Adding curl easy handle " << handle << std::endl;
+	//handle = handles[handles.size()-1];
+	
     }
+    
+    if ( !_init )
+      _init = true;
     
     //we can put an update() call here based on a flag?!
 }
 
 //TODO: critical section
-void fluidinfo::SessionDetails::update()
+void fluidinfo::SessionDetails::multiUpdateSession()
 {
-
+    /** Wait up to 1 seconds **/
+    
     FD_ZERO(&read_set);
     FD_ZERO(&write_set);
     FD_ZERO(&exc_set);
 
-    /** Wait up to 1 seconds **/
+    
     select_timeout.tv_sec = 1;
     select_timeout.tv_usec = 0;
 
@@ -137,12 +150,30 @@ void fluidinfo::SessionDetails::update()
 
     do {
 	
+      do {
         multi_perform_code = curl_multi_perform(parentSession->curl_multi_handle(), &running_handles);
+      }while(multi_perform_code == CURLM_CALL_MULTI_PERFORM);
+      
+      std::cout << "Multi perform code: " << multi_perform_code << std::endl;
+      std::cout << "Running handles: " << running_handles << std::endl;
+      //std::cout << "update(): running handles: " << running_handles << std::endl;
+	
+	maxfd = 0;
 
         cres = curl_multi_fdset(parentSession->curl_multi_handle(), &read_set, &write_set, &exc_set,&maxfd);
+	
+	std::cout << "Cres: " << cres << std::endl;
 
 		//if maxfd == -1 || running_handles == 0 No handles!
-		
+	
+	std::cout << "Maxfd: " << maxfd << std::endl;
+	
+	if ( maxfd == -1 ) 
+	{
+	    std::cout << "Maxfd is -1 " << std::endl;
+	    return;
+	}
+	
         if ( cres!= CURLM_OK )
         {
             //TODO throw exception ?
@@ -169,6 +200,7 @@ void fluidinfo::SessionDetails::update()
         if ( retval == -1 )
         {
             //TODO throw exception ?
+            std::cout << "select() failed " << std::endl;
             return;
         }
 
@@ -176,6 +208,7 @@ void fluidinfo::SessionDetails::update()
 
       CURLMsg *msg = NULL;
       int msg_queue = 0;
+      
       do {
 	      msg = curl_multi_info_read(parentSession->curl_multi_handle(), &msg_queue);
 		 std::cout << "Messages in queue left: " << msg_queue << std::endl;

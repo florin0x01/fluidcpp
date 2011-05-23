@@ -15,8 +15,7 @@ public:
         connections++;
 	http_headers = NULL;
 	std::cout << "Initializing SessionDetails() " << std::endl;
-	
-	handles.reserve(1000);
+
 	
 	//SEGFAULT here?
 	//permissionsMap();
@@ -25,10 +24,15 @@ public:
     }
 
     virtual ~SessionDetails() {
+	std::cout << "~SesssionDetails " << std::endl;
+	curl_easy_cleanup(handle);
+	/*
 	for ( int i = 0; i < handles.size(); i++) {
 	   curl_multi_remove_handle(parentSession->curl_multi_handle(), handles[i]);
 	   curl_easy_cleanup(handles[i]);
 	}
+	*/
+	
 	/*
 		may segfault in certain conditions
         if (http_headers) {
@@ -49,20 +53,18 @@ public:
 		setSSL(parentSession->getSSL());
     }
 
-    void update();
+    void multiUpdateSession();
 
 protected:
 
-    void init(bool multi=true, const std::string& headers="Content-Type: application/json");
+    void init(bool multi=false, const std::string headers="Content-Type: application/json");
 	   
-    std::vector<CURL*> handles;
+    CURL* handle;
     
-    CURL *const Handle() { return handles[handles.size()-1]; }
-
-    inline void printHandlesVector() {
-		for(int i=0; i < handles.size(); i++)
-			std::cout << handles[i] << std::endl;
-	}
+    //CURL *const Handle() { return handles[handles.size()-1]; }
+    inline CURL* const Handle() { return handle; }
+    
+ 
     
     bool _SSL;
     bool _sandbox;
@@ -88,7 +90,7 @@ protected:
     static std::vector<std::string>& categoriesMap();
     
 private:
-	CURL *handle;
+	//CURL *handle;
 };
 
 }
