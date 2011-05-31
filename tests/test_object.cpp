@@ -14,11 +14,17 @@ int main(int argc, char** argv)
 
 	
 	authentication auth;
+	
 	auth.password = "testfluidinfo";
 	auth.username = "nfpetrovici";
+
+	auth.password = "test";
+	auth.username = "test";
+	
 	session.setAuthentication(auth);
 	session.setName("testSession");
-	session.setSandbox(false);
+	//session.setSandbox(false);
+	session.setSandbox(true);
 	session.setSSL(false);
 	
 	if ( session.Start() == false ) {
@@ -31,9 +37,13 @@ int main(int argc, char** argv)
 	myObj.setParentSession(&session);
 	string about="gigi";
 	
-	Namespace ns("CPPnamespace2", "fluidinfo cpp namespace");
+	Namespace ns("CPPnsss99", "fluidinfo cpp namespace");
 	ns.setParentSession(&session);
+	
 	ns.create();
+	std::cout << "Namespace fresh: " << ns.isFresh() << std::endl;
+	
+	return 0;
 	
 	
 //	cout << "About: " ;

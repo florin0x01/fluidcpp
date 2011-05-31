@@ -12,19 +12,30 @@ namespace fluidinfo{
 	{
 		public:
 			Namespace() { _name=""; }
-			Namespace(std::string name,std::string description=""):_name(name),_description(description) { }
+			Namespace(std::string name,std::string description=""):_name(name),_description(description), fresh(true) { }
 			virtual ~Namespace();
 
-			void set(std::string name, std::string description="") { _name = name; _description=description; }
+			void set(std::string name, std::string description="") { _name = name; _description=description; fresh=true; }
 	
 			std::string getName() { return _name; }
 			std::string getDescription() { return _description; }
-			std::vector<Namespace*> getNamespaces(bool returnDescription="", bool returnTags="");
+			void getSubNamespaceInfo(const std::string& subns, bool returnDescription="", bool returnTags="");
 			
 			void getSecurity(security&, categories categ);
 			void setSecurity(security&, categories categ);
 			void del();
 			void create();
+			void setError(std::string err) {
+			    std::cout << "setError called " << std::endl;
+			    _err = err;
+			   if ( _err == "NamespaceAlreadyExists" ) {
+			     std::cout << "ff" << std::endl;
+			     fresh = false;
+			   }
+			}
+			bool isFresh() {
+			    return fresh;
+			}
 
 		protected:
 			std::string _name;
@@ -38,9 +49,12 @@ namespace fluidinfo{
 		
 			security _securityObj;
 			
+			bool fresh;
+			
 			
 			//callbacks
 			static size_t FWcreate(void *ptr, size_t size, size_t nmemb, void* p);
+			static size_t FWGetSubNamespaceInfo(void *ptr, size_t size, size_t nmemb, void* p);
 
 		
 	}; 

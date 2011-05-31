@@ -3,16 +3,28 @@
 
 #include "generic_stuff.h"
 #include "fluid_session.h"
+#include <stdexcept>
 
 namespace fluidinfo {
 
 class SessionDetails {
+   
 public:
+  
+    class Exception: public std::runtime_error {
+    public:
+	Exception(const std::string &x): std::runtime_error(x), x(x) { }
+	const char* what() const throw () { return x.c_str(); }
+	~Exception() throw() { }
+    protected:
+	  std::string x;
+    };
+  
     SessionDetails() {
         _SSL = false;
-        _sandbox=false;
         _init=false;
         connections++;
+	_err = "";
 	http_headers = NULL;
 	std::cout << "Initializing SessionDetails() " << std::endl;
 
@@ -46,9 +58,20 @@ public:
     void setSSL(bool SSL) {
         _SSL = SSL;
     };
+    
+    virtual void setError(std::string err) {
+	_err = err;
+	//throw Exception(_err);
+    }
+    
+    bool isError() {
+	return (!_err.empty());
+    }
+    
+    /*
     void setSandBox(bool sandboxMode=false) {
         _sandbox = sandboxMode;
-    }
+    }*/
     void setParentSession(Session *p) {
         parentSession = p;
 		setSSL(parentSession->getSSL());
@@ -68,8 +91,8 @@ protected:
  
     
     bool _SSL;
-    bool _sandbox;
     bool _init;
+    std::string _err;
 
     fd_set read_set;
     fd_set write_set;

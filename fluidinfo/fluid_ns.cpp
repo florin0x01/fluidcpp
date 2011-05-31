@@ -8,11 +8,38 @@ fluidinfo::Namespace::~Namespace()
 }
 
 
-vector< fluidinfo::Namespace* > fluidinfo::Namespace::getNamespaces(bool returnDescription, bool returnTags)
+void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, bool returnDescription, bool returnTags)
 {
  // _returnNamespaceDescription = returnDescription;
  // _returnTagsDescription = returnTags;
-  return _vns;
+ 
+  //clear vector;
+ 
+ for(int i = 0; i < _vns.size(); i++)
+ {
+    delete _vns[i];
+ }
+ 
+  _vns.clear();
+ 
+  init();
+ 
+  string url = mainURL;
+  
+  std::string returndesc = ( (returnDescription==false) ? "False" : "True" );
+  std::string returntags = ( (returnTags == false) ? "False" : "True" ); 
+  
+  url = url + "/namespaces/" + _name + "/" + subns + "?returnDescription=" + returndesc + "&returnTags=" + returntags;
+  
+  curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
+  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWgetSubNamespaceInfo);
+  curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+	
+  curl_easy_perform(handle);
+  
+  
+  
 }
 
 void fluidinfo::Namespace::create()
@@ -44,8 +71,9 @@ void fluidinfo::Namespace::create()
   
   Json::Value root;
   
-  Json::FastWriter writer;
-  //Json::StyledWriter writer;
+  //Json::FastWriter writer;
+  
+  Json::StyledWriter writer;
   
   root["description"] = _description;
   root["name"] = _name;
@@ -73,9 +101,10 @@ void fluidinfo::Namespace::create()
    
 }
 
+
+//callbacks
 size_t fluidinfo::Namespace::FWcreate(void* ptr, size_t size, size_t nmemb, void* p)
 {
-
 
   fluidinfo::Namespace *x = (fluidinfo::Namespace*)p;
   size_t recsize = size * nmemb;
@@ -101,4 +130,48 @@ size_t fluidinfo::Namespace::FWcreate(void* ptr, size_t size, size_t nmemb, void
   return recsize;
   
 }
+
+size_t fluidinfo::Namespace::FWGetSubNamespaceInfo(void* ptr, size_t size, size_t nmemb, void* p)
+{
+
+  fluidinfo::Namespace *ns = (fluidinfo::Namespace*)p;
+  
+    Json::Reader r;
+    Json::Value root;
+      
+    r.parse((char*)ptr, root);
+    
+    Json::Value::Members members = root.getMemberNames();
+    
+    for(Json::Value::Members::iterator it = members.begin(); it != members.end(); ++it)
+    {
+	if ( it->c_str() == "tagNames" ) {
+	  
+	}
+	
+	else if ( it->c_str() == "namespaceNames" ) {
+	  
+	}
+	
+	else if ( it->c_str() == "id" ) {
+	  
+	}
+	
+	else if ( it->c_str() == "description" ) {
+	  
+	}
+	
+	else {
+	    //??
+	}
+    }
+    
+    x->_id =  root["id"].asString();
+    x->_uri = root["URI"].asString();
+      
+    delete[] buf;
+  
+  return size * nmemb;
+}
+
 

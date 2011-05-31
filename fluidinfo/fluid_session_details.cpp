@@ -68,6 +68,8 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string headers)
     if ( !_init ) {
       std::cout << "Reinit() " << std::endl;
       handle = curl_easy_init();
+      curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, fluidinfo::Session::HeaderFunction);
+      curl_easy_setopt(handle, CURLOPT_WRITEHEADER, this);
     }
     
    // curl_easy_reset(handle);
@@ -83,6 +85,7 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string headers)
     
     /*** END CRITICAL SECTION ***/
     
+    curl_easy_setopt(handle, CURLOPT_USERAGENT, parentSession->UserAgent());
 
     if ( _SSL == true ) {
         curl_easy_setopt(handle, CURLOPT_URL, FLUID_HTTP_SSL);
@@ -92,12 +95,20 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string headers)
         mainURL = FLUID_HTTP_SSL;
     }
     else {
-        curl_easy_setopt(handle, CURLOPT_URL, FLUID_HTTP);
-        mainURL = FLUID_HTTP;
+	if ( parentSession->Sandbox() == true ) {
+	  std::cout << "Sandbox mode." << std::endl;
+	  curl_easy_setopt(handle, CURLOPT_URL, FLUID_SANDBOX_HTTP);
+	  mainURL = FLUID_SANDBOX_HTTP;
+	}
+	else {
+	  curl_easy_setopt(handle, CURLOPT_URL, FLUID_HTTP);
+	  mainURL = FLUID_HTTP;
+	}
     }
   
     
-    curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
+    //curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
+    
     curl_easy_setopt(handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     std::string ugly_user_pwd = parentSession->AuthObj.username + ":" + parentSession->AuthObj.password;
     curl_easy_setopt(handle, CURLOPT_USERPWD, ugly_user_pwd.c_str());

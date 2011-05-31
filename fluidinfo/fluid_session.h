@@ -15,6 +15,7 @@ namespace fluidinfo{
 	    }*/
 	    explicit Session(std::string name="", authentication* auth=NULL):_name(name),SSL(false),sandboxMode(false) { 
 	      CURLInitialized = false; 
+	      _userAgent = "fluidcpp 0.1";
 	      if ( auth != NULL )
 		      AuthObj = *auth;
 	    }
@@ -31,6 +32,10 @@ namespace fluidinfo{
 	    inline bool getSSL() { return SSL; }
 	    inline void setSandbox(bool sandbox=true) { sandboxMode = sandbox; }
 	    inline CURLM* curl_multi_handle() const { return curl_box; }
+	    inline bool Sandbox() { return sandboxMode; }
+	    inline const char* UserAgent() { return _userAgent.c_str(); }
+	    
+	    static size_t HeaderFunction(void *ptr, size_t size, size_t nmemb, void* user);
 	    
 	   inline bool Start() {
 		 curl_res = curl_global_init(CURL_GLOBAL_ALL);
@@ -49,7 +54,7 @@ namespace fluidinfo{
       protected:
 
 	    std::string _name;
-	
+	    std::string _userAgent;
 	    
 
 	    bool SSL;

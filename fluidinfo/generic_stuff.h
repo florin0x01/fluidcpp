@@ -33,6 +33,7 @@
 
 #define FLUID_HTTP_SSL "https://fluiddb.fluidinfo.com"
 #define FLUID_HTTP "http://fluiddb.fluidinfo.com"
+#define FLUID_SANDBOX_HTTP "http://sandbox.fluidinfo.com"
 
 #define FLUID_DEBUG  1
 
