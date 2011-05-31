@@ -131,7 +131,7 @@ size_t fluidinfo::Namespace::FWcreate(void* ptr, size_t size, size_t nmemb, void
   
 }
 
-size_t fluidinfo::Namespace::FWGetSubNamespaceInfo(void* ptr, size_t size, size_t nmemb, void* p)
+size_t fluidinfo::Namespace::FWgetSubNamespaceInfo(void* ptr, size_t size, size_t nmemb, void* p)
 {
 
   fluidinfo::Namespace *ns = (fluidinfo::Namespace*)p;
@@ -166,10 +166,10 @@ size_t fluidinfo::Namespace::FWGetSubNamespaceInfo(void* ptr, size_t size, size_
 	}
     }
     
-    x->_id =  root["id"].asString();
-    x->_uri = root["URI"].asString();
+//    x->_id =  root["id"].asString();
+ //   x->_uri = root["URI"].asString();
       
-    delete[] buf;
+    //delete[] buf;
   
   return size * nmemb;
 }

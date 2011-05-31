@@ -54,7 +54,7 @@ namespace fluidinfo{
 			
 			//callbacks
 			static size_t FWcreate(void *ptr, size_t size, size_t nmemb, void* p);
-			static size_t FWGetSubNamespaceInfo(void *ptr, size_t size, size_t nmemb, void* p);
+			static size_t FWgetSubNamespaceInfo(void *ptr, size_t size, size_t nmemb, void* p);
 
 		
 	}; 
