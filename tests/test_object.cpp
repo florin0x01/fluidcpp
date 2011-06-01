@@ -18,15 +18,15 @@ int main(int argc, char** argv)
 	auth.password = "testfluidinfo";
 	auth.username = "nfpetrovici";
 
-	/*
-	auth.password = "test";
-	auth.username = "test";
-	*/
+	
+	//auth.password = "test";
+	//auth.username = "test";
+	
 	
 	session.setAuthentication(auth);
 	session.setName("testSession");
 	//session.setSandbox(false);
-	session.setSandbox(true);
+	session.setSandbox(false);
 	session.setSSL(false);
 	
 	if ( session.Start() == false ) {
@@ -39,41 +39,26 @@ int main(int argc, char** argv)
 	myObj.setParentSession(&session);
 	string about="gigi";
 	
-	Namespace ns("CPPnsss99", "fluidinfo cpp namespace");
+	//get the handle for the "Acvariu" namespace
+	
+	//check getSubNamespaceInfo if namespace does not exist
+	Namespace ns;
 	ns.setParentSession(&session);
+	ns.getSubNamespaceInfo("Acvariu", ns);
 	
-	ns.create();
-	
-	std::cout << "Initializing namespace 2 " << std::endl;
-	
-	Namespace ns2;
-	ns2.setParentSession(&session);
-	
-	ns.getSubNamespaceInfo("gigi", ns2);
-	
-	std::cout << "Namespace fresh: " << ns.isFresh() << std::endl;
-	
-	if ( ns2.exists() ) {
-	      std::cout << "ns2 exists " << std::endl;
-	      std::cout << "Ns2 Id: " << ns2.getId() << std::endl;
-	    //  std::cout << "Ns2 Uri: " << ns2.getUri() << std::endl;
-	      std::cout << "Ns2 description: " << ns2.getDescription() << std::endl;
-	}
-	
-	else {
-	     std::cout << "Non-existent namespace " << std::endl;
-	     std::cout << "creating ns2 in subnamespace" << std::endl;
-	     ns2.set("gigi", "gigi subnamespace in CPPnsss99");
-	     ns2.create(ns.getName());
-	}
-	return 0;
+	cout << ns.getId() << endl;
+	cout << ns.getDescription() << endl;
 	
 	
-//	cout << "About: " ;
-//	cin>>about;
+	cout << ns.isFresh() << endl;
+	cout << ns.isError() << endl;
+	
+	cout << "About: " ;
+	cin>>about;
+
 	myObj.isAbout(about);
 	myObj.create();
-	myObj.putTag("myFirstTag", "CPPnamespace", "myFirstTagValue");
+	myObj.putTag("myFirstTag", "test/Acvariu", "myFirstTagValue");
 
 	//myObj.hasTag("myFirstTag");
 	

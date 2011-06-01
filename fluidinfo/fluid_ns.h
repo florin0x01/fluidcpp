@@ -23,7 +23,10 @@ namespace fluidinfo{
 			
 			void setParentSession(Session *p) {
 			  SessionDetails::setParentSession(p);
-			    _nameChain = parentSession->AuthObj.username + "/" + _name;
+			    if ( !_name.empty() )
+			      _nameChain = parentSession->AuthObj.username + "/" + _name;
+			    else
+			      _nameChain = parentSession->AuthObj.username;
 			}
 			
 			virtual ~Namespace();
@@ -34,7 +37,10 @@ namespace fluidinfo{
 			  if ( !isset ) {
 			    _name = name; 
 			    _description=description; fresh=true; 
-			    _nameChain = parentSession->AuthObj.username + "/" + _name;
+			     if ( !_name.empty() )
+			      _nameChain = parentSession->AuthObj.username + "/" + _name;
+			    else
+			      _nameChain = parentSession->AuthObj.username;
 			    isset = true;
 			  }
 			}

@@ -43,8 +43,10 @@ int main(int argc, char** argv)
     ns.create();
     std::cout << "Namespace exists: " << ns.exists() << endl;
     std::cout << "Namespace is fresh: " << ns.isFresh() << endl;
-    std::cout << "Deleting namespace " << endl;
-    ns.Delete();
+  
+    //std::cout << "Deleting namespace " << endl;
+    
+    //ns.Delete();
     
     return 0;
 }

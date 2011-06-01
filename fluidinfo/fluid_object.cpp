@@ -262,6 +262,7 @@ void fluidinfo::Object::putTag(const std::string& tag, const std::string& tagPat
 	else
 		url = url + "/objects/" + _id + "/" + tag;
 
+	std::cout << "Url: " << url << std::endl;
 	
 	long valueSize = value.size();
 
