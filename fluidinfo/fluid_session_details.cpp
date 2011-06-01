@@ -68,11 +68,13 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string headers)
     if ( !_init ) {
       std::cout << "Reinit() " << std::endl;
       handle = curl_easy_init();
-      curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, fluidinfo::Session::HeaderFunction);
-      curl_easy_setopt(handle, CURLOPT_WRITEHEADER, this);
     }
     
-   // curl_easy_reset(handle);
+    else 
+	curl_easy_reset(handle);
+    
+    curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, fluidinfo::Session::HeaderFunction);
+    curl_easy_setopt(handle, CURLOPT_WRITEHEADER, this);
     
     std::cout << "Calling init on handle " << handle << std::endl;
     

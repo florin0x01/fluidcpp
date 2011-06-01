@@ -8,19 +8,8 @@ fluidinfo::Namespace::~Namespace()
 }
 
 
-void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, bool returnDescription, bool returnTags)
+void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, fluidinfo::Namespace& nsret, bool returnDescription, bool returnTags, bool returnNamespaces)
 {
- // _returnNamespaceDescription = returnDescription;
- // _returnTagsDescription = returnTags;
- 
-  //clear vector;
- 
- for(int i = 0; i < _vns.size(); i++)
- {
-    delete _vns[i];
- }
- 
-  _vns.clear();
  
   init();
  
@@ -28,29 +17,37 @@ void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, bool re
   
   std::string returndesc = ( (returnDescription==false) ? "False" : "True" );
   std::string returntags = ( (returnTags == false) ? "False" : "True" ); 
+  std::string returnnamespaces = ( (returnNamespaces == false) ? "False" : "True" );
   
-  url = url + "/namespaces/" + _name + "/" + subns + "?returnDescription=" + returndesc + "&returnTags=" + returntags;
+  url = url + "/namespaces/" + _nameChain + "/" + subns + "?returnDescription=" + returndesc + "&returnNamespaces=" + returnnamespaces + "&returnTags=" + returntags;
+  
+  std::cout << "Url is : " << url << std::endl;
   
   curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
   curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
   curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWgetSubNamespaceInfo);
-  curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
+  curl_easy_setopt(handle, CURLOPT_WRITEDATA, &nsret);
 	
   curl_easy_perform(handle);
   
-  
-  
 }
 
-void fluidinfo::Namespace::create()
+void fluidinfo::Namespace::create(const std::string& parentNs)
 {
     init();
   
   string url = mainURL;
   string doc = "";
   
-  url = url + "/namespaces/" + parentSession->AuthObj.username;
+  //something fishy here regarding the relative path of the subnamespaces
   
+  if (parentNs == "")
+    url = url + "/namespaces/" + parentSession->AuthObj.username;
+  
+  else {
+    url = url + "/namespaces/" + parentSession->AuthObj.username + "/" + parentNs;
+    _nameChain = _nameChain + "/" + parentNs;
+  }
   cout << "Url is " << url << endl;
   
   CURLcode c;
@@ -125,6 +122,7 @@ size_t fluidinfo::Namespace::FWcreate(void* ptr, size_t size, size_t nmemb, void
     x->_uri = root["URI"].asString();
     
     delete[] buf;
+    x->_nonexistent = false;
   }
   
   return recsize;
@@ -143,26 +141,38 @@ size_t fluidinfo::Namespace::FWgetSubNamespaceInfo(void* ptr, size_t size, size_
     
     Json::Value::Members members = root.getMemberNames();
     
+     //std::cout << root << std::endl;
+    
     for(Json::Value::Members::iterator it = members.begin(); it != members.end(); ++it)
     {
-	if ( it->c_str() == "tagNames" ) {
-	  
+     
+	if ( *it == "tagNames" ) {
+	     const Json::Value tagNames = root["tagNames"];
+	     for( int index = 0; index < tagNames.size(); index++) 
+	     {
+		//tagNames[index].asString();
+		ns->_tagNames.push_back(tagNames[index].asString());
+	     }
 	}
 	
-	else if ( it->c_str() == "namespaceNames" ) {
-	  
+	else if ( *it == "namespaceNames" ) {
+	      const Json::Value namespaceNames = root["namespaceNames"];
+	      for( int index = 0; index < namespaceNames.size(); index++)
+	      {
+		  ns->_namespaceNames.push_back(namespaceNames[index].asString());
+	      }
 	}
 	
-	else if ( it->c_str() == "id" ) {
-	  
+	else if ( *it == "id" ) {
+	      ns->_id = root["id"].asString();
+	      ns->_nonexistent = false;
 	}
 	
-	else if ( it->c_str() == "description" ) {
-	  
+	else if ( *it == "description" ) {
+	      ns->_description = root["description"].asString();
 	}
 	
 	else {
-	    //??
 	}
     }
     

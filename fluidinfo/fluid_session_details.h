@@ -61,6 +61,8 @@ public:
     
     virtual void setError(std::string err) {
 	_err = err;
+	if (_err == "InternalServerError" )
+	  throw Exception(_err);
 	//throw Exception(_err);
     }
     
@@ -72,7 +74,7 @@ public:
     void setSandBox(bool sandboxMode=false) {
         _sandbox = sandboxMode;
     }*/
-    void setParentSession(Session *p) {
+    virtual void setParentSession(Session *p) {
         parentSession = p;
 		setSSL(parentSession->getSSL());
     }
