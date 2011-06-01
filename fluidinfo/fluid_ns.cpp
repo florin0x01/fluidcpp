@@ -32,6 +32,63 @@ void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, fluidin
   
 }
 
+void fluidinfo::Namespace::updateDescription(const std::string& description)
+{
+   //set the Content Type to primitive value
+   init(false, "Content-Type: application/vnd.fluiddb.value+json");
+
+   string url = mainURL;
+   string doc = "";
+  
+  long valueSize = description.size();
+
+  std::string valx = description;
+  
+  Json::Value root;
+  Json::FastWriter writer;
+  
+  root["description"] = valx;
+  
+  doc = writer.write(root);
+  valueSize = doc.size();
+  
+  cout << "Will write " << doc << " with size " << valueSize << endl;
+  cout << "Setting options on handle " << handle << endl;
+  
+  curl_easy_setopt(handle, CURLOPT_UPLOAD, 1L);
+  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+
+  curl_easy_setopt(handle, CURLOPT_READFUNCTION, FWupdateDescription);
+  curl_easy_setopt(handle, CURLOPT_READDATA, doc.c_str());
+  curl_easy_setopt(handle, CURLOPT_INFILESIZE, strlen(doc.c_str()));
+  
+  http_headers = curl_slist_append(http_headers, "Expect: ");
+  curl_easy_setopt(handle, CURLOPT_HTTPHEADER, http_headers);
+  
+  cout << "updateDescription(): running curl_easy_perform(handle) " << endl;
+    
+  curl_easy_perform(handle);
+   
+}
+
+void fluidinfo::Namespace::Delete()
+{
+  init();
+  string url = mainURL;
+  string doc = "";
+  
+  url = url + "/namespaces/" + _nameChain;
+  cout << "Url is : " << url << endl;
+  
+  CURLcode c;
+  
+  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
+  curl_easy_setopt(handle, CURLOPT_CUSTOMREQUEST, "DELETE");
+  
+  curl_easy_perform(handle);
+}
+
 void fluidinfo::Namespace::create(const std::string& parentNs)
 {
     init();
@@ -127,6 +184,26 @@ size_t fluidinfo::Namespace::FWcreate(void* ptr, size_t size, size_t nmemb, void
   
   return recsize;
   
+}
+
+size_t fluidinfo::Namespace::FWupdateDescription(void* ptr, size_t size, size_t nmemb, void* p)
+{
+   //must do this some other way
+  static int done = 0;
+  if (done) 
+    return 0;
+   memcpy(ptr, p, strlen((const char*)p));
+   //std::cout << "Ptr: " << (char*)ptr << std::endl;
+   
+   /*
+   std::cout << "size: " << size << std::endl;
+   std::cout << "nmemb: " << nmemb << std::endl;
+   std::cout << "ptr: " << (char*)ptr << std::endl;
+   std::cout << "recsize: " << recsize << std::endl;
+   */
+   
+   done = 1;
+   return strlen((const char*)p);
 }
 
 size_t fluidinfo::Namespace::FWgetSubNamespaceInfo(void* ptr, size_t size, size_t nmemb, void* p)

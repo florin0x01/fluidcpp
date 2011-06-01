@@ -249,7 +249,7 @@ void fluidinfo::Object::put(const std::string& tagPath, const std::string& tag, 
 void fluidinfo::Object::putTag(const std::string& tag, const std::string& tagPath, const std::string& value)
 {
 	//set the Content Type to primitive value
-	init(true, "Content-Type: application/vnd.fluiddb.value+json");
+	init(false, "Content-Type: application/vnd.fluiddb.value+json");
 	
 	if ( tag == "" )
 	  return;
@@ -405,6 +405,7 @@ size_t fluidinfo::Object::FWputBlob(void* ptr, size_t size, size_t nmemb, void* 
 
 size_t fluidinfo::Object::FWputTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
+  //must do this some other way
   static int done = 0;
   if (done) 
     return 0;
@@ -420,6 +421,7 @@ size_t fluidinfo::Object::FWputTag(void* ptr, size_t size, size_t nmemb, void* p
    
    done = 1;
    return strlen((const char*)p);
+   
 }
 
 size_t fluidinfo::Object::FWgetTagValue(void* ptr, size_t size, size_t nmemb, void* p)

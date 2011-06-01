@@ -30,9 +30,13 @@ namespace fluidinfo{
 			
 
 			void set(std::string name, std::string description="") { 
-			  _name = name; 
-			  _description=description; fresh=true; 
-			  _nameChain = parentSession->AuthObj.username + "/" + _name;
+			  static bool isset = false;
+			  if ( !isset ) {
+			    _name = name; 
+			    _description=description; fresh=true; 
+			    _nameChain = parentSession->AuthObj.username + "/" + _name;
+			    isset = true;
+			  }
 			}
 	
 			std::string getName() const { return _name; }
@@ -44,7 +48,8 @@ namespace fluidinfo{
 			
 			void getSecurity(security&, categories categ);
 			void setSecurity(security&, categories categ);
-			void del();
+			void Delete();
+			void updateDescription(const std::string &description);
 			void create(const std::string& parentNs="");
 			void setError(std::string err) {
 			   // ((SessionDetails*)this)->setError(err); SEGFAULT here
@@ -93,6 +98,7 @@ namespace fluidinfo{
 			//callbacks
 			static size_t FWcreate(void *ptr, size_t size, size_t nmemb, void* p);
 			static size_t FWgetSubNamespaceInfo(void *ptr, size_t size, size_t nmemb, void* p);
+			static size_t FWupdateDescription(void *ptr, size_t size, size_t nmemb, void* p);
 
 		
 	}; 
