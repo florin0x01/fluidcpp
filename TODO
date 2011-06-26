@@ -1,5 +1,5 @@
 - Add tag support
-- Add base class
-- Automatic commit system
-- Query system (string based probably)
-- Start coding :)
+- Add proxy design support to eliminate the "init()" bshit
+- Add Exception support from general wide callback
+
+- New deadline for all the functions except 18n: 25 July '11
