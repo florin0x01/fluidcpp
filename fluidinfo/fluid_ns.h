@@ -4,6 +4,7 @@
 #include "generic_stuff.h"
 #include "fluid_security.h"
 #include "fluid_session_details.h"
+#include "fluid_tag.h"
 
 
 /*@@ TODO: operator[int], operator[string] to get namespace by index or string, put some methods in the base impl */
@@ -31,16 +32,20 @@ namespace fluidinfo{
 			
 			virtual ~Namespace();
 			
-
+			void addTag(Tag&);
+			
 			void set(std::string name, std::string description="") { 
 			  static bool isset = false;
 			  if ( !isset ) {
 			    _name = name; 
-			    _description=description; fresh=true; 
-			     if ( !_name.empty() )
+			    _description=description; 
+			    fresh=true; 
+			    
+			    if ( !_name.empty() )
 			      _nameChain = parentSession->AuthObj.username + "/" + _name;
 			    else
 			      _nameChain = parentSession->AuthObj.username;
+			    
 			    isset = true;
 			  }
 			}
@@ -49,7 +54,7 @@ namespace fluidinfo{
 			std::string getDescription() const { return _description; }
 			std::string getId() const { return _id; }
 			std::string getUri() const { return _uri; }
-			
+				
 			void getSubNamespaceInfo(const std::string& subns, Namespace& ret, bool returnDescription=true, bool returnTags=true, bool returnNamespaces=true);
 			
 			void getSecurity(security&, categories categ);
@@ -104,6 +109,7 @@ namespace fluidinfo{
 			//callbacks
 			static size_t FWcreate(void *ptr, size_t size, size_t nmemb, void* p);
 			static size_t FWgetSubNamespaceInfo(void *ptr, size_t size, size_t nmemb, void* p);
+			
 			static size_t FWupdateDescription(void *ptr, size_t size, size_t nmemb, void* p);
 
 		

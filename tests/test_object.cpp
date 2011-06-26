@@ -26,7 +26,8 @@ int main(int argc, char** argv)
 	session.setAuthentication(auth);
 	session.setName("testSession");
 	//session.setSandbox(false);
-	session.setSandbox(false);
+	
+	session.setSandbox(true);
 	session.setSSL(false);
 	
 	if ( session.Start() == false ) {

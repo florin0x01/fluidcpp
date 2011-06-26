@@ -32,12 +32,40 @@ void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, fluidin
   
 }
 
+void fluidinfo::Namespace::addTag(Tag& tag)
+{
+    init();
+    
+    string url = mainURL;
+    string doc="";
+    
+    url = url + "/tags/" + _nameChain;
+    
+    Json::Value root;
+    Json::FastWriter writer;
+    
+    root["description"] = tag.description;
+    root["indexed"] = (tag.indexed == false) ? "false" : "true";
+    root["name"] = tag.name;
+    
+    doc = writer.write(root);
+    
+    curl_easy_setopt(handle, CURLOPT_POST, 1L);
+    curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWaddTag);
+    
+    //test this
+    curl_easy_setopt(handle, CURLOPT_WRITEDATA, &tag);
+    
+    curl_easy_perform(handle);
+}
+
 void fluidinfo::Namespace::updateDescription(const std::string& description)
 {
    //set the Content Type to primitive value
    init(false, "Content-Type: application/vnd.fluiddb.value+json");
 
-   string url = mainURL;
+   string url = mainURL + "/namespaces/" + _nameChain;
    string doc = "";
   
   long valueSize = description.size();
@@ -204,6 +232,33 @@ size_t fluidinfo::Namespace::FWupdateDescription(void* ptr, size_t size, size_t 
    
    done = 1;
    return strlen((const char*)p);
+}
+
+size_t fluidinfo::Namespace::FWaddTag ( void* ptr, size_t size, size_t nmemb, void* p )
+{
+  
+    fluidinfo::Tag *x = (fluidinfo::Tag*)p;
+    size_t recsize = size * nmemb;
+    if  ( recsize ) {
+	char *buf = new char[recsize+1];
+	memset(buf,0,recsize+1);
+	memcpy(buf, ptr, recsize);
+    #ifdef FLUID_DEBUG
+	cout << "FWaddTag(): " << buf << endl;
+    #endif
+
+	Json::Reader r;
+	Json::Value root;
+    
+	r.parse(buf, root);
+    
+	x->id =  root["id"].asString();
+	x->uri = root["URI"].asString();
+    
+	delete[] buf;
+    }
+  
+  return recsize;
 }
 
 size_t fluidinfo::Namespace::FWgetSubNamespaceInfo(void* ptr, size_t size, size_t nmemb, void* p)
