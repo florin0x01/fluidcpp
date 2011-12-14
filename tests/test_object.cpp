@@ -8,33 +8,52 @@
 using namespace fluidinfo;
 using namespace std;
 
-int main(int argc, char** argv)
-{
-	Session session;
+Session session;
 
-	
+void initSession(const Session& Session, bool sandbox, bool ssl)
+{
 	authentication auth;
 	
 	auth.password = "testfluidinfo";
-	auth.username = "nfpetrovici";
-
-	
-	//auth.password = "test";
-	//auth.username = "test";
-	
-	
+	auth.username = "nfpetrovici";	
 	session.setAuthentication(auth);
 	session.setName("testSession");
-	//session.setSandbox(false);
+	session.setSandbox(sandbox);
+	session.setSSL(ssl);
 	
-	session.setSandbox(true);
-	session.setSSL(false);
+	if ( session.Start() == false )
+		throw std::logic_error("Could not start session");
 	
-	if ( session.Start() == false ) {
-		cout << "Could not start session :( " << endl;
-		return -1;
-	}
-	
+}
+
+Namespace::Ptr createNamespace(const std::string& name, const std::string& description)
+{
+	Namespace::Ptr ns;
+	ns.reset(new Namespace());
+	ns->setParentSession(&session);
+	ns->set("CXXNS", "C++ namespace");
+	ns->create();
+	return ns;
+}
+
+Object::Ptr createObject(const std::string& name, const std::string& description)
+{
+	Object::Ptr obj;
+	obj.reset(new Object());
+	obj->setName(name);
+	obj->isAbout(description);
+	obj->create();
+	return obj;
+}
+
+void tagObject(Object::Ptr obj, const std::string& tag, const std::string& path, const std::string &value)
+{
+	obj->putTag(tag, path, value);	
+}
+
+
+int main(int argc, char** argv)
+{
 	
 	Object myObj("TestObj");
 	myObj.setParentSession(&session);

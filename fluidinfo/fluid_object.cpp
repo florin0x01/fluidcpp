@@ -76,9 +76,8 @@ void fluidinfo::Object::create()
   
   curl_easy_perform(handle);
    
-  //get the info back
-  //_uri = ?
-  //_id = ?
+  //get the info back (this is done in the callback)
+  
 }
 
 std::vector<std::string> fluidinfo::Object::getIdsByQuery(const string& query)
