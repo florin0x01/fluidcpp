@@ -15,8 +15,8 @@ void initSession(const Session& Session, bool sandbox, bool ssl)
 {
 	authentication auth;
 	
-	auth.password = "testfluidinfo";
-	auth.username = "nfpetrovici";	
+	auth.password = "anon";
+	auth.username = "anon";	
 	session.setAuthentication(auth);
 	session.setName("testSession");
 	session.setSandbox(sandbox);
