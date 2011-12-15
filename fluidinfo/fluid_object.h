@@ -36,6 +36,9 @@ public:
 	std::string getURI() { return _uri; }
 	std::string getId() { return _id; }
 	
+	//TODO implement GET /objects/ID
+	Ptr getById(const std::string& id) { }
+	
 	//this should be static somehow...
 	std::vector<std::string> getIdsByQuery(const std::string& query);
 	

@@ -41,6 +41,7 @@ public:
         connections++;
         _err = "";
         http_headers = NULL;
+        parentSession = NULL;
         std::cerr << "Initializing SessionDetails() " << std::endl;
 
 
@@ -77,8 +78,9 @@ public:
 	//Error handling
     virtual void setError(std::string err) ;
 	
-    bool isError() {
-        return (!_err.empty());
+    bool isError() 
+	{
+        return (_err.size());
     }
     
     bool hasErrors() { return !errorVector.empty(); }
@@ -87,10 +89,6 @@ public:
 	const std::string& lastError() const { return _err; }
 	const std::vector<std::string>& getErrors() const { return errorVector; }
 
-    /*
-    void setSandBox(bool sandboxMode=false) {
-        _sandbox = sandboxMode;
-    }*/
     virtual void setParentSession(Session *p) 
 	{
         parentSession = p;

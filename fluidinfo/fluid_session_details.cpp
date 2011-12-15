@@ -157,6 +157,12 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string headers)
 {
     //User classes must call init() each time they do a request...
 
+	if ( !parentSession )
+	{
+		setError("NULL session");
+		return;
+	}		
+	
     /*** START CRITICAL SECTION ***/
     if ( !_init ) {
         std::cerr << "Reinit() " << std::endl;

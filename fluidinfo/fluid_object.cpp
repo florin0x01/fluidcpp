@@ -229,11 +229,16 @@ size_t fluidinfo::Object::FWgetIdsByQuery(void* ptr, size_t size, size_t nmemb, 
 		
 		//x->_tagPaths = root["tagPaths"];
 		
-		Object::ids.reserve(root["ids"].size());
-				
+		Json::Value ids = root.get("ids", Json::nullValue);
+		if ( ids == Json::nullValue )
+			return recsize;
+		
+		if ( root["ids"].size() )
+			Object::ids.clear();
+	
 		for (int i =0 ; i < root["ids"].size(); i++) 
 		{
-			Object::ids[i] = root["ids"][i].asString();	
+			Object::ids.push_back(root["ids"][i].asString());	
 		}
 		 delete[] buf;
 	}
