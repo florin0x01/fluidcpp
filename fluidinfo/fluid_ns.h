@@ -4,15 +4,16 @@
 #include "generic_stuff.h"
 #include "fluid_security.h"
 #include "fluid_session_details.h"
-//#include "fluid_tag.h"
+#include "fluid_tag.h"
 
 
 /*@@ TODO: operator[int], operator[string] to get namespace by index or string, put some methods in the base impl */
 namespace fluidinfo {
 class Namespace: public SessionDetails
 {
-typedef std::auto_ptr<Namespace> Namespace::Ptr ;
 public:
+	typedef std::auto_ptr<Namespace> Ptr ;
+
     Namespace():_name(""), _description(""), _id(""), _uri(""), fresh(true), _nonexistent(true)
     {
         _nameChain = "";
@@ -33,7 +34,7 @@ public:
 
     virtual ~Namespace();
 
-    void addTag(const Tag& tag);
+    void addTag(const Tag& tag, bool indexed=true);
 
     void set(std::string name, std::string description="") {
         static bool isset = false;
@@ -71,25 +72,10 @@ public:
     void Delete();
     void updateDescription(const std::string &description);
     void create(const std::string& parentNs="");
-    void setError(std::string err) {
-        // ((SessionDetails*)this)->setError(err); SEGFAULT here
-
-        std::cout << "setError called " << std::endl;
-        _err = err;
-        if ( _err == "NamespaceAlreadyExists" ) {
-            fresh = false;
-            _nonexistent = false;
-        }
-
-        if ( _err == "JsonParseError" ) {
-
-        }
-
-        if ( _err == "NonexistentNamespace" ) {
-            _nonexistent = true;
-        }
-
-    }
+    void setError(std::string err);
+	
+    const std::string& GetPath() const { return _nameChain; } 
+    
     bool isFresh() {
         return fresh;
     }
@@ -118,8 +104,8 @@ protected:
     //callbacks
     static size_t FWcreate(void *ptr, size_t size, size_t nmemb, void* p);
     static size_t FWgetSubNamespaceInfo(void *ptr, size_t size, size_t nmemb, void* p);
-
     static size_t FWupdateDescription(void *ptr, size_t size, size_t nmemb, void* p);
+	static size_t FWaddTag(void *ptr, size_t size, size_t nmemb, void* p);
 
 
 };

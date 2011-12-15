@@ -29,22 +29,22 @@ int main(int argc, char** argv)
     
     
     if ( !initSession(session, auth) ) {
-	    cout << "Could not start session :( " << endl;
+	    cerr << "Could not start session :( " << endl;
 	    return -1;
     }
     
     std::string ns_name;
-    cout << "Namespace name: ";
+    cerr << "Namespace name: ";
     cin >> ns_name;
     
-    cout << "Creating namespace " << ns_name << endl;
+    cerr << "Creating namespace " << ns_name << endl;
     Namespace ns(ns_name);
     ns.setParentSession(&session);
     ns.create();
-    std::cout << "Namespace exists: " << ns.exists() << endl;
-    std::cout << "Namespace is fresh: " << ns.isFresh() << endl;
+    std::cerr << "Namespace exists: " << ns.exists() << endl;
+    std::cerr << "Namespace is fresh: " << ns.isFresh() << endl;
   
-    //std::cout << "Deleting namespace " << endl;
+    //std::cerr << "Deleting namespace " << endl;
     
     //ns.Delete();
     

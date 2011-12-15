@@ -1,10 +1,29 @@
 #include "fluid_ns.h"
+#include "fluid_tag.h"
 
 using namespace std;
 
 fluidinfo::Namespace::~Namespace()
 {
 
+}
+
+void fluidinfo::Namespace::setError(string err)
+{
+    fluidinfo::SessionDetails::setError(err);
+	if ( _err == "NamespaceAlreadyExists" ) {
+		fresh = false;
+		_nonexistent = false;
+	}
+
+	if ( _err == "JsonParseError" ) {
+
+	}
+
+	if ( _err == "NonexistentNamespace" ) {
+		_nonexistent = true;
+	}
+	
 }
 
 
@@ -21,109 +40,41 @@ void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, fluidin
   
   url = url + "/namespaces/" + _nameChain + "/" + subns + "?returnDescription=" + returndesc + "&returnNamespaces=" + returnnamespaces + "&returnTags=" + returntags;
   
-  std::cout << "Url is : " << url << std::endl;
-  
-  curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
-  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-  curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWgetSubNamespaceInfo);
-  curl_easy_setopt(handle, CURLOPT_WRITEDATA, &nsret);
-	
-  curl_easy_perform(handle);
-  
+  runCURL(GET, url, NULL, FWgetSubNamespaceInfo, reinterpret_cast<fluidinfo::Namespace*>(&nsret));  
 }
 
-void fluidinfo::Namespace::addTag(Tag& tag)
+void fluidinfo::Namespace::addTag(const Tag& tag, bool indexed)
 {
     init();
     
-    string url = mainURL;
-    string doc="";
-    
-    url = url + "/tags/" + _nameChain;
-    
-    Json::Value root;
-    Json::FastWriter writer;
-    
-    root["description"] = tag.description;
-    root["indexed"] = (tag.indexed == false) ? "false" : "true";
-    root["name"] = tag.name;
-    
-    doc = writer.write(root);
-    
-    curl_easy_setopt(handle, CURLOPT_POST, 1L);
-    curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWaddTag);
-    
-    //test this
-    curl_easy_setopt(handle, CURLOPT_WRITEDATA, &tag);
-    
-    curl_easy_perform(handle);
+	Json::Value root;
+	root["description"] = tag.Description();
+    root["indexed"] = (indexed == false) ? "false" : "true";
+    root["name"] = tag.Name();
+    	
+	// !!!
+    runCURL(POST, mainURL + "/tags/" + _nameChain, &root, FWaddTag, const_cast<fluidinfo::Tag*>(&tag));
 }
 
 void fluidinfo::Namespace::updateDescription(const std::string& description)
 {
    //set the Content Type to primitive value
    init(false, "Content-Type: application/vnd.fluiddb.value+json");
-
-   string url = mainURL + "/namespaces/" + _nameChain;
-   string doc = "";
-  
-  long valueSize = description.size();
-
-  std::string valx = description;
-  
-  Json::Value root;
-  Json::FastWriter writer;
-  
-  root["description"] = valx;
-  
-  doc = writer.write(root);
-  valueSize = doc.size();
-  
-  cout << "Will write " << doc << " with size " << valueSize << endl;
-  cout << "Setting options on handle " << handle << endl;
-  
-  curl_easy_setopt(handle, CURLOPT_UPLOAD, 1L);
-  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-
-  curl_easy_setopt(handle, CURLOPT_READFUNCTION, FWupdateDescription);
-  curl_easy_setopt(handle, CURLOPT_READDATA, doc.c_str());
-  curl_easy_setopt(handle, CURLOPT_INFILESIZE, strlen(doc.c_str()));
-  
-  http_headers = curl_slist_append(http_headers, "Expect: ");
-  curl_easy_setopt(handle, CURLOPT_HTTPHEADER, http_headers);
-  
-  cout << "updateDescription(): running curl_easy_perform(handle) " << endl;
-    
-  curl_easy_perform(handle);
-   
+   Json::Value root;
+  root["description"] = description;
+  runCURL(PUT, mainURL + "/namespaces/" + _nameChain, &root, FWupdateDescription);
 }
 
 void fluidinfo::Namespace::Delete()
 {
   init();
-  string url = mainURL;
-  string doc = "";
-  
-  url = url + "/namespaces/" + _nameChain;
-  cout << "Url is : " << url << endl;
-  
-  CURLcode c;
-  
-  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-  curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
-  curl_easy_setopt(handle, CURLOPT_CUSTOMREQUEST, "DELETE");
-  
-  curl_easy_perform(handle);
+  runCURL(DELETE, mainURL + "/namespaces/" + _nameChain);
 }
 
 void fluidinfo::Namespace::create(const std::string& parentNs)
 {
-    init();
-  
+  init();
   string url = mainURL;
-  string doc = "";
-  
   //something fishy here regarding the relative path of the subnamespaces
   
   if (parentNs == "")
@@ -133,58 +84,16 @@ void fluidinfo::Namespace::create(const std::string& parentNs)
     url = url + "/namespaces/" + parentSession->AuthObj.username + "/" + parentNs;
     _nameChain = _nameChain + "/" + parentNs;
   }
-  cout << "Url is " << url << endl;
-  
-  CURLcode c;
-  
-  curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
- 
-  c = curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, FWcreate );
-  if ( c != CURLE_OK ) 
-	  cout << "WRITEFUNCTION failed: " << c << endl;
-  
-  
-  c = curl_easy_setopt(handle, CURLOPT_WRITEDATA, this);
-  if  ( c != CURLE_OK )
-	cout << "WRITEDATA failed: " << c << endl;
-  
-  
-  curl_easy_setopt(handle, CURLOPT_POST, 1);
-  
-  Json::Value root;
-  
-  //Json::FastWriter writer;
-  
-  Json::StyledWriter writer;
-  
+  cerr << "Url is " << url << endl;
+  Json::Value root; 
   root["description"] = _description;
   root["name"] = _name;
   
-  doc = writer.write(root);
-  
-  if ( root == Json::nullValue ) {
-      doc = "";
-      cout << "Null value " << endl;
-  }	
-
-   
-  cout << "Will write " << doc.c_str() << "with size " << strlen(doc.c_str()) << endl;
-  cout << "Curl handle"  << handle << endl;
- 
-   //or set CURLOPT_POSTFIELDSIZE to 0?!!
-   if ( doc != "" ) {
-	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, (long)strlen(doc.c_str())); 
-	curl_easy_setopt(handle, CURLOPT_COPYPOSTFIELDS, doc.c_str());
-   }
-   else
-	curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, 0);
-  
-  curl_easy_perform(handle);
-   
+  runCURL(POST, url, &root, FWcreate);
 }
 
-
 //callbacks
+
 size_t fluidinfo::Namespace::FWcreate(void* ptr, size_t size, size_t nmemb, void* p)
 {
 
@@ -195,7 +104,7 @@ size_t fluidinfo::Namespace::FWcreate(void* ptr, size_t size, size_t nmemb, void
     memset(buf,0,recsize+1);
     memcpy(buf, ptr, recsize);
   #ifdef FLUID_DEBUG
-	cout << "FWCreate(): " << buf << endl;
+	cerr << "FWCreate(): " << buf << endl;
   #endif
 
     Json::Reader r;
@@ -221,13 +130,13 @@ size_t fluidinfo::Namespace::FWupdateDescription(void* ptr, size_t size, size_t 
   if (done) 
     return 0;
    memcpy(ptr, p, strlen((const char*)p));
-   //std::cout << "Ptr: " << (char*)ptr << std::endl;
+   //std::cerr << "Ptr: " << (char*)ptr << std::endl;
    
    /*
-   std::cout << "size: " << size << std::endl;
-   std::cout << "nmemb: " << nmemb << std::endl;
-   std::cout << "ptr: " << (char*)ptr << std::endl;
-   std::cout << "recsize: " << recsize << std::endl;
+   std::cerr << "size: " << size << std::endl;
+   std::cerr << "nmemb: " << nmemb << std::endl;
+   std::cerr << "ptr: " << (char*)ptr << std::endl;
+   std::cerr << "recsize: " << recsize << std::endl;
    */
    
    done = 1;
@@ -244,7 +153,7 @@ size_t fluidinfo::Namespace::FWaddTag ( void* ptr, size_t size, size_t nmemb, vo
 	memset(buf,0,recsize+1);
 	memcpy(buf, ptr, recsize);
     #ifdef FLUID_DEBUG
-	cout << "FWaddTag(): " << buf << endl;
+	cerr << "FWaddTag(): " << buf << endl;
     #endif
 
 	Json::Reader r;
@@ -252,8 +161,8 @@ size_t fluidinfo::Namespace::FWaddTag ( void* ptr, size_t size, size_t nmemb, vo
     
 	r.parse(buf, root);
     
-	x->id =  root["id"].asString();
-	x->uri = root["URI"].asString();
+	x->Id() =  root["id"].asString();
+	x->Uri() = root["URI"].asString();
     
 	delete[] buf;
     }
@@ -273,7 +182,7 @@ size_t fluidinfo::Namespace::FWgetSubNamespaceInfo(void* ptr, size_t size, size_
     
     Json::Value::Members members = root.getMemberNames();
     
-     //std::cout << root << std::endl;
+     //std::cerr << root << std::endl;
     
     for(Json::Value::Members::iterator it = members.begin(); it != members.end(); ++it)
     {

@@ -5,10 +5,10 @@
 namespace fluidinfo{
 	
 	
-	enum permissions { CREATE,UPDATE,DELETE,LIST,CONTROL } ;
+	enum permissions { PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE, PERMISSION_LIST,PERMISSION_CONTROL } ;
 		
-	enum policy { OPEN, CLOSED };
-	enum categories { NS, TAGS, TAGVALUES };
+	enum policy { POLICY_OPEN, POLICY_CLOSED };
+	enum categories { CATEGORY_NS, CATEGORY_TAGS, CATEGORY_TAGVALUES };
 
 	struct security {
 		permissions perms;

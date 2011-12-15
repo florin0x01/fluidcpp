@@ -12,11 +12,12 @@ namespace fluidinfo{
 	
 class Object: public SessionDetails
 {
-typedef std::auto_ptr<Object> Object::Ptr ;	
 public:
-	Object() {  }
+	typedef std::auto_ptr<Object> Ptr ;	
+	
+	explicit Object() {  }
 	explicit Object(std::string name):_name(name) { }
-	virtual ~Object() { }
+	virtual ~Object();
 
 	void create();
 
@@ -28,6 +29,7 @@ public:
 	void putTag(const std::string& tag, const std::string& tagPath, const std::string& value);
 	void put(const std::string& tag, const std::string& tagPath, const std::string& filePath);
 	
+	//void setError(std::string err);	
 	
 	std::string getTagValue(std::string tag);
 	std::vector<std::string> getTagPaths(bool cached=false);

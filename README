@@ -1,0 +1,5 @@
+This is the FluidInfo C++ API binding to the 
+FluidInfo key/value store (http://www.fluidinfo.com)
+
+Currently, it supports the following features: Objects, Tags, Namespaces
+Still in testing.

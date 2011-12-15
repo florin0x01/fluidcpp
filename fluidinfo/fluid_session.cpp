@@ -3,16 +3,16 @@
 
 size_t fluidinfo::Session::HeaderFunction(void* ptr, size_t size, size_t nmemb, void* user)
 {
-    //std::cout << "Header Function " << std::endl;
-    std::cout << "---> " << (char*)ptr << std::endl;
+    //std::cerr << "Header Function " << std::endl;
+    std::cerr << "---> " << (char*)ptr << std::endl;
     if ( strstr((char*)ptr, "X-Fluiddb-Error-Class:") )
     {
-	//should we throw directly?
-	fluidinfo::SessionDetails *p = (fluidinfo::SessionDetails*)user;
-	char *what = strchr((char*)ptr, ':')+3;
-	what[strlen(what)-1] = '\0';
-	what[strlen(what)-1] = '\0';
-	p->setError(std::string(what));
+		//should we throw directly?
+		fluidinfo::SessionDetails *p = (fluidinfo::SessionDetails*)user;
+		char *what = strchr((char*)ptr, ':')+3;
+		what[strlen(what)-1] = '\0';
+		what[strlen(what)-1] = '\0';
+		p->setError(std::string(what));
     }
     
     //useless if exception gets thrown

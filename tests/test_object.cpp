@@ -1,5 +1,6 @@
 #include "fluid_object.h"
 #include "fluid_ns.h"
+#include "fluid_tag.h"
 #include "fluid_session.h"
 #include "fluid_session_details.h"
 
@@ -31,7 +32,7 @@ Namespace::Ptr createNamespace(const std::string& name, const std::string& descr
 	Namespace::Ptr ns;
 	ns.reset(new Namespace());
 	ns->setParentSession(&session);
-	ns->set("CXXNS", "C++ namespace");
+	ns->set(name, description);
 	ns->create();
 	return ns;
 }
@@ -40,7 +41,10 @@ Object::Ptr createObject(const std::string& name, const std::string& description
 {
 	Object::Ptr obj;
 	obj.reset(new Object());
+	obj->setParentSession(&session);
 	obj->setName(name);
+	
+	//TODO if About is empty then we receive an error from fluidinfo
 	obj->isAbout(description);
 	obj->create();
 	return obj;
@@ -54,36 +58,18 @@ void tagObject(Object::Ptr obj, const std::string& tag, const std::string& path,
 
 int main(int argc, char** argv)
 {
+	initSession(session, false, false);
 	
-	Object myObj("TestObj");
-	myObj.setParentSession(&session);
-	string about="gigi";
-	
-	//get the handle for the "Acvariu" namespace
-	
-	//check getSubNamespaceInfo if namespace does not exist
-	Namespace ns;
-	ns.setParentSession(&session);
-	ns.getSubNamespaceInfo("Acvariu", ns);
-	
-	cout << ns.getId() << endl;
-	cout << ns.getDescription() << endl;
+	Object::Ptr obj = createObject("CPPObj11", "This is a CPP API obj");
+	std::cout << obj->getId() << "\n";
+	std::cout << obj->getURI() << "\n";
 	
 	
-	cout << ns.isFresh() << endl;
-	cout << ns.isError() << endl;
+	Namespace::Ptr ns = createNamespace("CPPNS1", "This is a CPP namespace");
+	std::cout << ns->getId() << "\n";
+	std::cout << ns->getUri() << "\n";
 	
-	cout << "About: " ;
-	cin>>about;
-
-	myObj.isAbout(about);
-	myObj.create();
-	myObj.putTag("myFirstTag", "test/Acvariu", "myFirstTagValue");
-
-	//myObj.hasTag("myFirstTag");
-	
-	cout << "Object id: " << myObj.getId() << endl;
-	cout << "Object URI: " << myObj.getURI() << endl;
+	tagObject(obj, "CPPTag1", "", "CPPValue1");
 	
 	return 0;
 }
