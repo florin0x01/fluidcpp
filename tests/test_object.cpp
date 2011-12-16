@@ -11,12 +11,18 @@ using namespace std;
 
 Session session;
 
+template <typename T>
+void printVector(const std::vector<T> vec)
+{
+	for(int i=0; i < vec.size(); i++)
+		std::cout << "\t" << vec[i] << "\n";
+}
+
 void initSession(const Session& Session, bool sandbox, bool ssl)
 {
 	authentication auth;
 	
-	auth.password = "anon";
- 	auth.username = "anon";	
+	auth.ReadFromFile("/tmp/pas.txt");	
 	session.setAuthentication(auth);
 	session.setName("testSession");
 	session.setSandbox(sandbox);
@@ -81,13 +87,37 @@ int main(int argc, char** argv)
 			std::cout << "Error: " << obj->getErrors()[i] << "\n";
 		obj->clearErrors();
 	}
-		
-	std::cout << "Object has tag CPPTag1: " << obj->hasTag("CPPTag1") << "\n";
+	
+	std::string tag = "nfpetrovici/CPPTag1";
+	
+	std::cout << " => Object has " << tag << ":" << Object::hasTag(obj->getId(), tag , session) << "\n";
 	
 		
-	std::vector<std::string> objs = obj->getIdsByQuery("has nfpetrovici/tags/Apple_Online_Store");	
-	for (int x=0; x < objs.size(); x++)
-		std::cout << objs[x] << std::endl;
+	std::cout << " => Object getIdsByQuery \n";
+	
+	std::vector<std::string> objs = Object::getIdsByQuery("has nfpetrovici/tags/Apple_Online_Store", session);	
+	printVector<std::string>(objs);
+
+	std::vector<std::string> tagPaths;	
+	
+	Object resObject;
+	resObject.setParentSession(&session);
+	std::cout << "==> Tag paths for object " << objs[0] << "\n";
+	resObject.setId(objs[0]);
+	tagPaths = resObject.getTagPaths();
+	printVector<std::string>(tagPaths);
+	std::cout << "Object about: " << resObject.getAbout() << "\n";
+	
+	
+	std::string tagValue = resObject.getTagValue("nfpetrovici/tags/Hot_News");
+	
+	std::cout << "Tag value: " << tagValue << std::endl;
+	
+	std::cout << "==> Obj getTagPaths() \n";
+	
+	tagPaths = obj->getTagPaths();
+	printVector<std::string>(tagPaths);
+	
 	
 	return 0;
 }

@@ -42,7 +42,8 @@ public:
         _err = "";
         http_headers = NULL;
         parentSession = NULL;
-        std::cerr << "Initializing SessionDetails() " << std::endl;
+   
+	//std::cerr << "Initializing SessionDetails() " << std::endl;
 
 
         //SEGFAULT here?
@@ -52,7 +53,7 @@ public:
     }
 
     virtual ~SessionDetails() {
-        std::cerr << "~SesssionDetails " << std::endl;
+   //     std::cerr << "~SesssionDetails " << std::endl;
         if ( _init )
             curl_easy_cleanup(handle);
         /*
@@ -90,15 +91,17 @@ public:
 	const std::vector<std::string>& getErrors() const { return errorVector; }
 
     virtual void setParentSession(Session *p) 
-	{
+    {
         parentSession = p;
         setSSL(parentSession->getSSL());
     }
+    
 
     void multiUpdateSession();
 
 protected:
-
+    uint32_t lastContentLength;	
+	
     void init(bool multi=false, const std::string headers="Content-Type: application/json");
 	void runCURL(CURLRequestType type, const std::string& url, 
 				  const Json::Value* root=NULL, 
@@ -138,6 +141,8 @@ protected:
     static std::vector<std::string>& policyMap();
     static std::vector<std::string>& categoriesMap();
 
+    friend class Session;
+    
 private:
     //CURL *handle;
 };

@@ -3,11 +3,13 @@
 
 #include "generic_stuff.h"
 #include "fluid_security.h"
+#include <map>
 //#include "fluid_session_details.h"
 
 namespace fluidinfo{
-  
-  class Session {
+typedef size_t (*cbFunction)(void* obj) ;    
+
+class Session {
       public :
 	      /*
 	    Session():CURLInitialized(false),_name(""),SSL(false),sandboxMode(false) { 
@@ -37,6 +39,9 @@ namespace fluidinfo{
 	    
 	    static size_t HeaderFunction(void *ptr, size_t size, size_t nmemb, void* user);
 	    
+	    //should be protected
+	    void RegisterCallback(const std::string& error, cbFunction, void* obj );
+	    
 	   inline bool Start() {
 		 curl_res = curl_global_init(CURL_GLOBAL_ALL);
 	       
@@ -50,9 +55,16 @@ namespace fluidinfo{
 	       return true;
 	    }
 	    authentication AuthObj;
-	    
+private:
+	   struct cbStruct 
+	   {
+		   cbFunction cb;
+		   void *obj;
+	   };
+	   
       protected:
-
+	    std::map<std::string, cbStruct > cbMap_;
+	    
 	    std::string _name;
 	    std::string _userAgent;
 	    
@@ -63,8 +75,6 @@ namespace fluidinfo{
 	    
 	    CURLM *curl_box;
 	    CURLcode curl_res;
-	    
-	//    friend class SessionDetails;
 	    
   };
   

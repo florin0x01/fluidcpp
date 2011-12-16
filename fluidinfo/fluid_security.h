@@ -19,6 +19,7 @@ namespace fluidinfo{
 	struct authentication {
 	      std::string username;
 	      std::string password;
+	      void ReadFromFile(const char* x);
 	};
 	
 

@@ -86,10 +86,13 @@ void fluidinfo::SessionDetails::runCURL(fluidinfo::CURLRequestType type, const s
 	if ( NULL != root ) 
 	{
 		doc = writer.write(*root);
-		std::cerr << "Root not null\n";
+	//	std::cerr << "Root not null\n";
 	}
+	/*
 	std::cerr << "Method " << type << " Doc is " << doc.c_str() << "\n";
+	
 	std::cerr << "Url is " << url << "\n";
+	*/
 	
 	checkAndThrow (curl_easy_setopt(handle, CURLOPT_URL, url.c_str()));
 	http_headers = curl_slist_append(http_headers, "Expect: ");
@@ -147,7 +150,7 @@ void fluidinfo::SessionDetails::runCURL(fluidinfo::CURLRequestType type, const s
 
 void fluidinfo::SessionDetails::setError(std::string err)
 {
-	std::cerr << "setError called " << std::endl;	
+	//std::cerr << "setError called " << std::endl;	
 	_err = err;
 	errorVector.push_back(_err);
 }
@@ -165,7 +168,7 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string headers)
 	
     /*** START CRITICAL SECTION ***/
     if ( !_init ) {
-        std::cerr << "Reinit() " << std::endl;
+   //     std::cerr << "Reinit() " << std::endl;
         handle = curl_easy_init();
     }
 
@@ -174,7 +177,7 @@ void fluidinfo::SessionDetails::init(bool multi, const std::string headers)
     curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, fluidinfo::Session::HeaderFunction);
     curl_easy_setopt(handle, CURLOPT_WRITEHEADER, this);
 
-    std::cerr << "Calling init on handle " << handle << std::endl;
+   // std::cerr << "Calling init on handle " << handle << std::endl;
 
     //http_headers is not thread safe !
     if ( http_headers ) {
