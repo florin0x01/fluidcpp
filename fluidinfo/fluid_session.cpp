@@ -3,7 +3,6 @@
 
 size_t fluidinfo::Session::HeaderFunction(void* ptr, size_t size, size_t nmemb, void* user)
 {
-    //std::cerr << "Header Function " << std::endl;
    //std::cerr << "---> " << (char*)ptr ;
    
    if ( strstr((char*)ptr, "Content-Length:") )

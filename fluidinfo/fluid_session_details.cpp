@@ -146,6 +146,7 @@ void fluidinfo::SessionDetails::runCURL(fluidinfo::CURLRequestType type, const s
 	}
 	
 	curl_easy_perform(handle);
+	
 }
 
 void fluidinfo::SessionDetails::setError(std::string err)

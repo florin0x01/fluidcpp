@@ -65,7 +65,7 @@ public:
         return _uri;
     }
 
-    void getSubNamespaceInfo(const std::string& subns, Namespace& ret, bool returnDescription=true, bool returnTags=true, bool returnNamespaces=true);
+    void getSubNamespaceInfo(const std::string& subns, bool returnDescription=true, bool returnTags=true, bool returnNamespaces=true);
 
     void getSecurity(security&, categories categ);
     void setSecurity(security&, categories categ);

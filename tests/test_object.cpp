@@ -108,7 +108,10 @@ int main(int argc, char** argv)
 	resObject.setParentSession(&session);
 	std::cout << "==> Tag paths for object " << objs[0] << "\n";
 	resObject.setId(objs[0]);
+	
 	tagPaths = resObject.getTagPaths();
+	
+	
 	printVector<std::string>(tagPaths);
 	std::cout << "Object about: " << resObject.getAbout() << "\n";
 	

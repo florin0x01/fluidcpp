@@ -27,7 +27,7 @@ void fluidinfo::Namespace::setError(string err)
 }
 
 
-void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, fluidinfo::Namespace& nsret, bool returnDescription, bool returnTags, bool returnNamespaces)
+void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, bool returnDescription, bool returnTags, bool returnNamespaces)
 {
  
   init();
@@ -40,15 +40,15 @@ void fluidinfo::Namespace::getSubNamespaceInfo(const std::string& subns, fluidin
   
   url = url + "/namespaces/" + _nameChain + "/" + subns + "?returnDescription=" + returndesc + "&returnNamespaces=" + returnnamespaces + "&returnTags=" + returntags;
   
-  runCURL(GET, url, NULL, FWgetSubNamespaceInfo, reinterpret_cast<fluidinfo::Namespace*>(&nsret));  
+  runCURL(GET, url, NULL, FWgetSubNamespaceInfo, const_cast<Namespace*>(this));  
 }
 
 void fluidinfo::Namespace::addTag(const Tag& tag, bool indexed)
 {
     init();
     
-	Json::Value root;
-	root["description"] = tag.Description();
+    Json::Value root;
+    root["description"] = tag.Description();
     root["indexed"] = (indexed == false) ? "false" : "true";
     root["name"] = tag.Name();
     	
@@ -73,15 +73,19 @@ void fluidinfo::Namespace::Delete()
 
 void fluidinfo::Namespace::create(const std::string& parentNs)
 {
+  //NEED to supply a name via the set function
+  if ( _name == "" )
+	  return;
+  
   init();
   string url = mainURL;
   //something fishy here regarding the relative path of the subnamespaces
   
   if (parentNs == "")
-    url = url + "/namespaces/" + parentSession->AuthObj.username;
+    url = url + "/namespaces/" + parentSession->AuthObj.username + "/" + _name;
   
   else {
-    url = url + "/namespaces/" + parentSession->AuthObj.username + "/" + parentNs;
+    url = url + "/namespaces/" + parentSession->AuthObj.username + "/" + parentNs + "/" + _name;
     _nameChain = _nameChain + "/" + parentNs;
   }
   cerr << "Url is " << url << endl;
@@ -127,20 +131,17 @@ size_t fluidinfo::Namespace::FWupdateDescription(void* ptr, size_t size, size_t 
 {
    //must do this some other way
   static int done = 0;
-  if (done) 
-    return 0;
-   memcpy(ptr, p, strlen((const char*)p));
-   //std::cerr << "Ptr: " << (char*)ptr << std::endl;
-   
-   /*
-   std::cerr << "size: " << size << std::endl;
-   std::cerr << "nmemb: " << nmemb << std::endl;
-   std::cerr << "ptr: " << (char*)ptr << std::endl;
-   std::cerr << "recsize: " << recsize << std::endl;
-   */
-   
-   done = 1;
-   return strlen((const char*)p);
+  if (!done)
+  {
+	memcpy(ptr, p, strlen((const char*)p));
+	done = 1;
+	return strlen((const char*)p);
+  }
+  else
+  {
+	done = 0;
+	return 0;
+  }
 }
 
 size_t fluidinfo::Namespace::FWaddTag ( void* ptr, size_t size, size_t nmemb, void* p )
