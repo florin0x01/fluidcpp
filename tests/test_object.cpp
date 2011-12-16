@@ -77,9 +77,13 @@ int main(int argc, char** argv)
 	std::cout << ns->getId() << "\n";
 	std::cout << ns->getUri() << "\n";
 
+	//putTag and delTag automatically append username
+	obj->putTag("CPPTag1", "", "CPPValue1");
+	obj->putTag("CPPTag3", "", "Value3");
+	obj->putTag("CPPTag2", "", "Value3");
 	
-	tagObject(obj, "CPPTag1", "", "CPPValue1");
-
+	obj->delTag("CPPTag3");
+	obj->delTag("CPPTag3", "cpp_path");
 	
 	if ( obj->hasErrors() )
 	{

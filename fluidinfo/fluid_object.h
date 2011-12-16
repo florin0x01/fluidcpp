@@ -87,10 +87,6 @@ protected:
 	char* bufferGetTagPaths_;
 	uint32_t idx_bufferGetTagPaths_;
 	
-	bool CompletionHasTag_;
-	bool CompletionHasTagPaths_;
-	bool CompletionHasIdsByQuery_;
-	
 	static std::vector<FILE*> openFiles;
 	
 	std::string delete_request;

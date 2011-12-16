@@ -127,9 +127,9 @@ void fluidinfo::Object::delTag(const std::string& tag, const std::string& tagPat
 	
 	//TODO do we need our username here?
 	if ( !tagPath.empty() )
-		url = url + "/objects/" + _id + "/" + tagPath + "/" + tag;
+		url = url + "/objects/" + _id + "/" + parentSession->AuthObj.username + "/" + tagPath + "/" + tag;
 	else
-		url = url + "/objects/" + _id + "/" + tag;
+		url = url + "/objects/" + _id + "/" + parentSession->AuthObj.username + "/" + tag;
 	
 	runCURL(DELETE, url);
 	
@@ -381,23 +381,23 @@ size_t fluidinfo::Object::FWputBlob(void* ptr, size_t size, size_t nmemb, void* 
 
 size_t fluidinfo::Object::FWputTag(void* ptr, size_t size, size_t nmemb, void* p)
 {
-  //must do this some other way
-  static int done = 0;
-  if (done) 
-    return 0;
-   memcpy(ptr, p, strlen((const char*)p));
-   //std::cerr << "Ptr: " << (char*)ptr << std::endl;
+   if ( ptr == NULL ) return 0;
    
-   /*
-   std::cerr << "size: " << size << std::endl;
-   std::cerr << "nmemb: " << nmemb << std::endl;
-   std::cerr << "ptr: " << (char*)ptr << std::endl;
-   std::cerr << "recsize: " << recsize << std::endl;
-   */
+   static bool completionPutTag_ = false;
    
-   done = 1;
-   return strlen((const char*)p);
+   if ( completionPutTag_ == false ) 
+   {
+	   memcpy(ptr, p, strlen((const char*)p));
+	   completionPutTag_ = true;
+	   return strlen((const char*)p);	
+   }
+   else
+   {
+	completionPutTag_ = false;
+	return 0;
+   }
    
+   return 0; 
 }
 
 size_t fluidinfo::Object::FWgetTagValue(void* ptr, size_t size, size_t nmemb, void* p)
