@@ -1,2 +1,5 @@
-Finish testing: Object, Tag, Namespace
-Add: Permissions system, upload/download file
+Upload/download files
+Users class
+better unicode support
+HTTP pipelining
+Windows port

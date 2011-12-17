@@ -17,7 +17,7 @@ class Session {
 	    }*/
 	    explicit Session(std::string name="", authentication* auth=NULL):_name(name),SSL(false),sandboxMode(false) { 
 	      CURLInitialized = false; 
-	      _userAgent = "fluidcpp 0.1";
+	      _userAgent = "fluidcpp 0.5";
 	      if ( auth != NULL )
 		      AuthObj = *auth;
 	    }
