@@ -1,12 +1,11 @@
-This is the FluidInfo C++ API binding to the 
-FluidInfo key/value store (http://www.fluidinfo.com)
+This is the FluidInfo C++ API binding to the FluidInfo key/value store (http://www.fluidinfo.com)
 
 It supports the following features: Objects, Tags, Namespaces, Values, About
 
 |COMPILE|	-> Linux, possibly BSD, Windows -> contact me
 |_______|	-> Use compilers: g++ 4.4 or g++ 4.6
 
-DEPENDS ON:	libcurl, JsonCpp (http://jsoncpp.sourceforge.net)
+DEPENDS ON:	cmake (build system), libcurl, JsonCpp (http://jsoncpp.sourceforge.net)
 
 Many thanks to Terry Jones and the FluidInfo team for answering my questions.
 
