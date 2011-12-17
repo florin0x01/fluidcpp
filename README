@@ -2,8 +2,15 @@ This is the FluidInfo C++ API binding to the FluidInfo key/value store (http://w
 
 It supports the following features: Objects, Tags, Namespaces, Values, About
 
-|COMPILE|	-> Linux, possibly BSD, Windows -> contact me
-|_______|	-> Use compilers: g++ 4.4 or g++ 4.6
+_______________________
+|   HOW TO COMPILE    |	
+|_____________________|
+
+-> Operating systems: Linux, possibly BSD, Windows -> contact me
+-> Use compilers: g++ 4.4 or g++ 4.6
+-> Step 1. Ensure you have the dependencies. Unarchive the contents. 
+-> Step 2. mkdir build && cd build && cmake .. && make
+-> Step 3. Done. You should have the binaries in the build/ folder along with some tests
 
 DEPENDS ON:	cmake (build system), libcurl, JsonCpp (http://jsoncpp.sourceforge.net)
 
