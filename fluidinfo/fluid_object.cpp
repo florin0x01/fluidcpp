@@ -301,15 +301,6 @@ size_t fluidinfo::Object::FWgetIdsByQuery(void* ptr, size_t size, size_t nmemb, 
 size_t fluidinfo::Object::FWgetTagPaths(void* ptr, size_t size, size_t nmemb, void* p)
 {
    fluidinfo::Object *x = (fluidinfo::Object*)p;
-
-   static int c = 0;
-   c++;
-   
-   std::cerr << "Call " << c << std::endl;
-   
-   std::cerr << "Last content length: " << x->lastContentLength << "\n";
-   std::cerr << "idx: " << x->idx_bufferGetTagPaths_ << "\n";
-   std::cerr << "Buffer empty: " <<  ((x->bufferGetTagPaths_ == NULL) ? "empty\n" : "no\n");
    
    if ( x->idx_bufferGetTagPaths_ < x->lastContentLength )
    {
