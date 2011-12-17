@@ -70,24 +70,18 @@ fluidinfo::Object::Ptr fluidinfo::Object::getById(const std::string& oid, const 
 	Object::Ptr obj(new Object());
 	obj->setParentSession(const_cast<Session*>(&session));
 	obj->init();
+	obj->_id = oid;
 	obj->runCURL(GET, obj->mainURL + "/objects/" + oid + "?showAbout=True", NULL, 
 		     FWgetTagPaths, const_cast<Object*>(obj.get()));
+	
 	return obj;
 }
 
 //GET /objects/id
-vector< string > fluidinfo::Object::getTagPaths(bool cached)
+vector< string > fluidinfo::Object::getTagPaths()
 {
-	if ( cached )
-	{
-		std::cerr << "Returning tagPaths \n";
-		return _tagPaths;
-	}
-	if ( _id == "" ) 
-	{
-	   std::cerr << "Id is empty \n";	 
-	   return _tagPaths;
-	}
+	if ( _id == "" ) setError("Object::getTagPaths(): Id is empty");	 
+	
 	init();	
 	//TODO do we need our username here?
 	std::string url = mainURL + "/objects/" + _id + "?showAbout=True";
@@ -100,9 +94,6 @@ vector< string > fluidinfo::Object::getTagPaths(bool cached)
 
 string fluidinfo::Object::getTagValue(string tag)
 {
-  if ( _tagMap.find(tag) != _tagMap.end() )
-	  return _tagMap[tag];
-  
   init();
   if ( _about == "")
      return "";
@@ -289,6 +280,7 @@ size_t fluidinfo::Object::FWgetIdsByQuery(void* ptr, size_t size, size_t nmemb, 
 		if ( ids == Json::nullValue )
 		{
 			delete[] buf;
+			obj->bufferGetIdsByQuery_ = NULL;
 			return recsize;
 		}
 		if ( root["ids"].size() )
@@ -299,7 +291,9 @@ size_t fluidinfo::Object::FWgetIdsByQuery(void* ptr, size_t size, size_t nmemb, 
 			obj->ids.push_back(root["ids"][i].asString());	
 		}
 			delete[] buf;
+			obj->bufferGetIdsByQuery_ = NULL;
 	}
+	
 	
 	return recsize;
 }
@@ -308,13 +302,20 @@ size_t fluidinfo::Object::FWgetTagPaths(void* ptr, size_t size, size_t nmemb, vo
 {
    fluidinfo::Object *x = (fluidinfo::Object*)p;
 
-//   std::cerr << "Last content length: " << x->lastContentLength << "\n";
-//   std::cerr << "idx: " << x->idx_bufferGetTagPaths_ << "\n";
+   static int c = 0;
+   c++;
+   
+   std::cerr << "Call " << c << std::endl;
+   
+   std::cerr << "Last content length: " << x->lastContentLength << "\n";
+   std::cerr << "idx: " << x->idx_bufferGetTagPaths_ << "\n";
+   std::cerr << "Buffer empty: " <<  ((x->bufferGetTagPaths_ == NULL) ? "empty\n" : "no\n");
    
    if ( x->idx_bufferGetTagPaths_ < x->lastContentLength )
    {
 	if ( !x->bufferGetTagPaths_ )
 	{
+	   std::cerr << "INIT BUFFER" << std::endl;
 	   x->bufferGetTagPaths_ = new char[x->lastContentLength+1];
 	   memset(x->bufferGetTagPaths_, 0, x->lastContentLength+1);	
 	   x->idx_bufferGetTagPaths_ = 0;
@@ -331,39 +332,41 @@ size_t fluidinfo::Object::FWgetTagPaths(void* ptr, size_t size, size_t nmemb, vo
    size_t recsize = size * nmemb;
    x->idx_bufferGetTagPaths_ = 0;
    
+   char *buf = x->bufferGetTagPaths_;	
    if ( recsize ) 
    { 
-	char *buf = x->bufferGetTagPaths_;	
-	Json::Reader r;
-	Json::Value root;
-	r.parse(buf, root);
 	
-	Json::Value about = root.get("about", Json::nullValue);
-	if ( about != Json::nullValue )
-		x->_about = about.asString();
-	else	
-		x->_about = "";
+		Json::Reader r;
+		Json::Value root;
+		r.parse(buf, root);
+		
+		Json::Value about = root.get("about", Json::nullValue);
+		if ( about != Json::nullValue )
+			x->_about = about.asString();
+		else	
+			x->_about = "";
+		
+		Json::Value tagPaths = root.get("tagPaths", Json::nullValue);
+		if ( tagPaths == Json::nullValue )
+		{
+			delete[] buf;
+			x->bufferGetTagPaths_ = NULL;
+			return recsize;
+		}
+		
+		//std::cerr << "Tagpaths size: " << root["tagPaths"].size() << "\n";
+		//std::cerr << "About: " << x->_about << "\n";
+		
+		for (int i =0 ; i < root["tagPaths"].size(); i++) 
+		{
+			x->_tagPaths.push_back(root["tagPaths"][i].asString());	
+		}
 	
-	Json::Value tagPaths = root.get("tagPaths", Json::nullValue);
-	if ( tagPaths == Json::nullValue )
-	{
-		delete[] buf;
-		return recsize;
-	}
-	
-	//std::cerr << "Tagpaths size: " << root["tagPaths"].size() << "\n";
-	//std::cerr << "About: " << x->_about << "\n";
-	
-	for (int i =0 ; i < root["tagPaths"].size(); i++) 
-	{
-		x->_tagPaths.push_back(root["tagPaths"][i].asString());	
-	}
-	
-	
-	delete[] buf;
+		 delete[] buf;
+		 x->bufferGetTagPaths_ = NULL;
    }
    
- 
+  
    return recsize;
 }
 
@@ -437,9 +440,10 @@ size_t fluidinfo::Object::FWgetTagValue(void* ptr, size_t size, size_t nmemb, vo
    //Now we have the whole buffer
    if ( recsize ) 
    {
-	char *buf = x->bufferGetTagValue_;
-	x->_tagMap[tag_request] = buf;
-	delete[] buf;
+		char *buf = x->bufferGetTagValue_;
+		x->_tagMap[tag_request] = buf;
+		delete[] buf;
+		x->bufferGetTagValue_ = NULL;
    }
    return recsize;
 }

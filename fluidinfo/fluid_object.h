@@ -43,7 +43,15 @@ public:
 	void setError(std::string err);	
 	
 	std::string getTagValue(std::string tag);
-	std::vector<std::string> getTagPaths(bool cached=false);
+	std::vector<std::string> getTagPaths();
+	std::vector<std::string> getTagPathsFromCache() { return _tagPaths; }
+	std::string getTagValueFromCache(const std::string& tag)
+	{
+		   if ( _tagMap.find(tag) != _tagMap.end() )
+				return _tagMap[tag];
+			else
+				return "";	
+	}
 	static Ptr getById(const std::string& , const Session& );
 	
 	//Looks like fluidinfo does not have a function to get the URI based on the ID
@@ -62,9 +70,9 @@ public:
 	std::map<std::string,std::string> _tagMap; //tag name, tag value
 	
 protected:
+	std::string _id;
 	std::string _name;
 	std::string _about;
-	std::string _id;
 	std::string _uri;
 	
 

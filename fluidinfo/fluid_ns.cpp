@@ -293,6 +293,7 @@ size_t fluidinfo::Namespace::FWgetSubNamespaceInfo(void* ptr, size_t size, size_
 //   x->_uri = root["URI"].asString();
 
     delete[] buf;
+	ns->bufferGetNsInfo_ = NULL;
 
     return size * nmemb;
 }
