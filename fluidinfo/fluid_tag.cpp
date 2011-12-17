@@ -10,42 +10,27 @@ void Tag::setParentSession(Session* p)
   nameChain_ = "tags/" + parentSession->AuthObj.username + "/";
 }
 
-void Tag::Add( const std::string& nsPath, const std::string& name, const std::string& description, bool indexed)
+void Tag::Add(const Session& session, const std::string& nsPath, const std::string& name, 
+			  const std::string& description, bool indexed)
 {
   Tag::ptr tag(new Tag());
+  tag->setParentSession(const_cast<Session*>(&session));
   tag->init();
 
   Json::Value root;
   
   root["description"] = description;
-  root["indexed"] = (indexed == true) ? "true" : "false";
+  root["indexed"] = indexed;
   root["name"] = name;
  
   tag->runCURL(POST, tag->mainURL + "/tags/" + tag->parentSession->AuthObj.username + "/" + nsPath, 
 			   &root, FWAdd, const_cast<Tag*>(tag.get())); 
 }
 
-Tag Tag::Get(const std::string& nsPath, const std::string& name, bool returnDescription)
-{ 
-  Tag::ptr tag(new Tag());
-  tag->init();
-  std::string url = tag->mainURL + "/" + nameChain_ + nsPath + "/" + name;
-  if ( returnDescription == true )
-	  url += "?returnDescription=True";
-  else
-	  url += "?returnDescription=False";
-  tag->runCURL(GET, url, NULL, FWGet, const_cast<Tag*>(tag.get())); 
-  return *tag;
-}
-
-Tag Tag::Get(const fluidinfo::Namespace& ns, const std::string& name, bool returnDescription)
-{
-	return Get(ns.getPath(), name, returnDescription);
-}
-
-void Tag::Update(const std::string& nsPath, const std::string& name, const std::string& description)
+void Tag::UpdateDescription(const Session& session, const std::string& nsPath, const std::string& name, const std::string& description)
 {
   Tag::ptr tag(new Tag());
+  tag->setParentSession(const_cast<Session*>(&session));
   tag->init();
 
   Json::Value root;
@@ -55,13 +40,33 @@ void Tag::Update(const std::string& nsPath, const std::string& name, const std::
 			   &root, FWUpdate, const_cast<Tag*>(tag.get()));
 }
 
-void Tag::Delete(const std::string&nsPath, const std::string& name)
+void Tag::Delete(const Session& session, const std::string&nsPath, const std::string& name)
 {
   Tag::ptr tag(new Tag());
+  tag->setParentSession(const_cast<Session*>(&session));
   tag->init();
   tag->runCURL(DELETE, tag->mainURL + "/tags/" + tag->parentSession->AuthObj.username + "/" + nsPath + "/" + name, 
 			   NULL, FWDelete, const_cast<Tag*>(tag.get()) );
 }
+
+Tag::Ptr Tag::Get(const Session& session, const std::string& nsPath, const std::string& name)
+{ 
+  Tag::ptr tag(new Tag());
+  tag->setParentSession(const_cast<Session*>(&session));
+  tag->init();
+  std::string url = tag->mainURL + "/" + tag->nameChain_ + nsPath + "/" + name;
+  url += "?returnDescription=True";
+  
+  tag->runCURL(GET, url, NULL, FWGet, const_cast<Tag*>(tag.get())); 
+  return tag;
+}
+
+Tag::Ptr Tag::Get(const fluidinfo::Namespace& ns, const std::string& name)
+{
+	return Get(*ns.parentSession, ns.getPath(), name);
+}
+
+
 
 size_t Tag::FWAdd(void* ptr, size_t size, size_t nmemb, void* p)
 {
@@ -125,7 +130,23 @@ size_t Tag::FWGet(void* ptr, size_t size, size_t nmemb, void* p)
 
 size_t Tag::FWUpdate(void* ptr, size_t size, size_t nmemb, void* p)
 {
-//nothing to put here
+   if ( ptr == NULL ) return 0;
+   
+   static bool completionUpdate_ = false;
+   
+   if ( completionUpdate_ == false ) 
+   {
+	   memcpy(ptr, p, strlen((const char*)p));
+	   completionUpdate_ = true;
+	   return strlen((const char*)p);	
+   }
+   else
+   {
+	completionUpdate_ = false;
+	return 0;
+   }
+   
+   return 0; 
 }
 
 

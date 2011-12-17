@@ -5,8 +5,8 @@ size_t fluidinfo::Session::HeaderFunction(void* ptr, size_t size, size_t nmemb, 
 {
    std::cerr << "---> " << (char*)ptr ;
    
-   if( strstr((char*)ptr, "Unauthorized") )
-		throw std::logic_error("Unauthorized");
+   //if( strstr((char*)ptr, "Unauthorized") )
+	//	throw std::logic_error("Unauthorized");
    
    if ( strstr((char*)ptr, "Content-Length:") )
    {
@@ -41,8 +41,7 @@ size_t fluidinfo::Session::HeaderFunction(void* ptr, size_t size, size_t nmemb, 
 				s.cb(s.obj);
 			}
     }
-		
-    //useless if exception gets thrown
+	
     return size * nmemb;
 }
 

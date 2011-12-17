@@ -127,5 +127,14 @@ int main(int argc, char** argv)
 	printVector<std::string>(tagPaths);
 	
 	
+	std::cout << "Object::getById() " << std::endl;
+	Object::Ptr obj2 = Object::getById("695474d1-aa83-4252-a097-89ea355db241", session);
+	std::cout << "About: " << obj2->getAbout() << std::endl;
+	
+	printVector<std::string>(obj2->getTagPaths());
+	
+	std::cout << "--------------\n";
+	std::cout << obj2->getTagValue("nfpetrovici/tags/test");
+	
 	return 0;
 }

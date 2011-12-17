@@ -6,3 +6,6 @@ target_link_libraries(TestObject ${CURL_LIBRARY} fluidinfo)
 
 add_executable(TestNs test_ns.cpp)
 target_link_libraries(TestNs ${CURL_LIBRARY} fluidinfo)
+
+add_executable(TestTag test_tag.cpp)
+target_link_libraries(TestTag ${CURL_LIBRARY} fluidinfo)

@@ -13,7 +13,8 @@ class Namespace;
 class Tag: public SessionDetails
 {
 public:
-	typedef std::auto_ptr<Tag> ptr;
+	typedef std::auto_ptr<Tag> Ptr;
+	typedef Ptr ptr;
 	
 	Tag(const Tag& ) { }
 	Tag(): name_(""), description_(""), id_(""), nsPath_(""), nameChain_(""), indexed_(false) { }
@@ -38,14 +39,16 @@ public:
 	
 	bool Indexed() { return indexed_ ; }
 	
-	static void Add(const std::string& nsPath, const std::string& name, const std::string& description, bool indexed=true);
-	static void Update(const std::string& nsPath, const std::string& name, const std::string& description);
+	static void Add(const Session& session, const std::string& nsPath, const std::string& name, 
+					const std::string& description="", bool indexed=true);
+	static void UpdateDescription(const Session& session, const std::string& nsPath, const std::string& name, 
+					   const std::string& description);
 //	static void Update(const Tag& tag);
-	static void Delete(const std::string& nsPath, const std::string& name);
+	static void Delete(const Session& session, const std::string& nsPath, const std::string& name);
 	
 	
-	Tag Get(const std::string& nsPath, const std::string& name, bool returnDescription=true);
-	Tag Get(const Namespace& ns, const std::string& name, bool returnDescription=true);
+	static Ptr Get(const Session& session, const std::string& nsPath, const std::string& name);
+	static Ptr Get(const Namespace& ns, const std::string& name);
 	
 	
 private:
