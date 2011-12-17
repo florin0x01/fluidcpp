@@ -356,6 +356,7 @@ size_t fluidinfo::Object::FWgetTagPaths(void* ptr, size_t size, size_t nmemb, vo
 		
 		//std::cerr << "Tagpaths size: " << root["tagPaths"].size() << "\n";
 		//std::cerr << "About: " << x->_about << "\n";
+		x->_tagPaths.clear();
 		
 		for (int i =0 ; i < root["tagPaths"].size(); i++) 
 		{

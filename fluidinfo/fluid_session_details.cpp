@@ -88,9 +88,9 @@ void fluidinfo::SessionDetails::runCURL(fluidinfo::CURLRequestType type, const s
 		doc = writer.write(*root);
 	//	std::cerr << "Root not null\n";
 	}
-	/*
+	
 	std::cerr << "Method " << type << " Doc is " << doc.c_str() << "\n";
-	*/
+	
 	std::cerr << "Url is " << url << "\n";
 	
 	

@@ -4,8 +4,6 @@
 #include "generic_stuff.h"
 #include "fluid_security.h"
 #include "fluid_session_details.h"
-#include <boost/thread/mutex.hpp>
-
 
 //TODO also implement /about functionality here
 
