@@ -8,6 +8,7 @@
 
 namespace fluidinfo {
 
+	
 enum CURLRequestType
 {
 	GET,
@@ -142,6 +143,7 @@ protected:
     static std::vector<std::string>& categoriesMap();
 
     friend class Session;
+	friend class Tag;
     
 private:
     //CURL *handle;

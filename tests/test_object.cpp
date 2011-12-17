@@ -111,6 +111,7 @@ int main(int argc, char** argv)
 	
 	tagPaths = resObject.getTagPaths();
 	
+	//TODO test getById
 	
 	printVector<std::string>(tagPaths);
 	std::cout << "Object about: " << resObject.getAbout() << "\n";

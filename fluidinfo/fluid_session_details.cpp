@@ -90,9 +90,9 @@ void fluidinfo::SessionDetails::runCURL(fluidinfo::CURLRequestType type, const s
 	}
 	/*
 	std::cerr << "Method " << type << " Doc is " << doc.c_str() << "\n";
-	
-	std::cerr << "Url is " << url << "\n";
 	*/
+	std::cerr << "Url is " << url << "\n";
+	
 	
 	checkAndThrow (curl_easy_setopt(handle, CURLOPT_URL, url.c_str()));
 	http_headers = curl_slist_append(http_headers, "Expect: ");

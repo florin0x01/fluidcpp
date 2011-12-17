@@ -63,6 +63,8 @@ protected:
     static size_t FWUpdate	(void *ptr, size_t size, size_t nmemb, void* p);
 	static size_t FWGet		(void *ptr, size_t size, size_t nmemb, void* p);
 	static size_t FWDelete	(void *ptr, size_t size, size_t nmemb, void* p);	
+	
+	friend class Namespace;
 		
 };
 

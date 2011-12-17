@@ -3,7 +3,10 @@
 
 size_t fluidinfo::Session::HeaderFunction(void* ptr, size_t size, size_t nmemb, void* user)
 {
-   //std::cerr << "---> " << (char*)ptr ;
+   std::cerr << "---> " << (char*)ptr ;
+   
+   if( strstr((char*)ptr, "Unauthorized") )
+		throw std::logic_error("Unauthorized");
    
    if ( strstr((char*)ptr, "Content-Length:") )
    {
@@ -26,8 +29,8 @@ size_t fluidinfo::Session::HeaderFunction(void* ptr, size_t size, size_t nmemb, 
 		what[strlen(what)-1] = '\0';
 		std::string whatStr = what;
 		std::cerr << "ERRR: " << whatStr << "\n";
-		if ( whatStr == "Unauthorized" )
-			throw std::logic_error("Unauthorized error. Check username/password");
+	//	if ( whatStr == "Unauthorized" )
+		//	throw std::logic_error("Unauthorized error. Check username/password");
 		p->setError(whatStr);
 		
 		if ( p->parentSession )

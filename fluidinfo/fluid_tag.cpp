@@ -40,7 +40,7 @@ Tag Tag::Get(const std::string& nsPath, const std::string& name, bool returnDesc
 
 Tag Tag::Get(const fluidinfo::Namespace& ns, const std::string& name, bool returnDescription)
 {
-	return Get(ns.GetPath(), name, returnDescription);
+	return Get(ns.getPath(), name, returnDescription);
 }
 
 void Tag::Update(const std::string& nsPath, const std::string& name, const std::string& description)

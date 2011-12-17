@@ -14,42 +14,44 @@ class Namespace: public SessionDetails
 public:
 	typedef std::auto_ptr<Namespace> Ptr ;
 
-    Namespace():_name(""), _description(""), _id(""), _uri(""), fresh(true), _nonexistent(true)
+    Namespace():_name(""), _description(""), _id(""),
+				bufferGetNsInfo_(NULL),idx_bufferGetNsInfo_(0)
     {
         _nameChain = "";
+		_nsNotEmpty = false;
     }
 
-    Namespace(std::string name,std::string description=""):_name(name),_description(description),_id(""), _uri(""), fresh(true), _nonexistent(true)
+    Namespace(std::string name,std::string description=""):_name(name),_description(description),_id(""), 
+															_uri(""), fresh(true), _nonexistent(true),
+															bufferGetNsInfo_(NULL),idx_bufferGetNsInfo_(0)
     {
         // _nameChain = parentSession->AuthObj.username + "/" + _name;
+        _nameChain = "";
+		_nsNotEmpty = false;
     }
 
-    void setParentSession(Session *p) {
+    void setParentSession(Session *p) 
+	{
         SessionDetails::setParentSession(p);
-        if ( !_name.empty() )
-            _nameChain = parentSession->AuthObj.username + "/" + _name;
-        else
-            _nameChain = parentSession->AuthObj.username;
+		_nameChain = parentSession->AuthObj.username;
+		_name = _description = _id = _uri = "";
+		_tagNames.clear();
+		_namespaceNames.clear();
+		bufferGetNsInfo_ = NULL;
+		idx_bufferGetNsInfo_ = 0;
+		_nsNotEmpty = false;
     }
 
     virtual ~Namespace();
 
+	void addTag(const std::string& tag, const std::string& description="", bool indexed=true, std::string& uri=gTemp, std::string& id=gTemp);
     void addTag(const Tag& tag, bool indexed=true);
 
     void set(std::string name, std::string description="") {
-        static bool isset = false;
-        if ( !isset ) {
-            _name = name;
-            _description=description;
-            fresh=true;
-
-            if ( !_name.empty() )
-                _nameChain = parentSession->AuthObj.username + "/" + _name;
-            else
-                _nameChain = parentSession->AuthObj.username;
-
-            isset = true;
-        }
+		_name = name;
+		_description=description;
+		fresh=true;
+		_nameChain = parentSession->AuthObj.username;
     }
 
     std::string getName() const {
@@ -64,17 +66,20 @@ public:
     std::string getUri() const {
         return _uri;
     }
+    
+    const std::vector<std::string>& getTagNames() const { return _tagNames; }
+    const std::vector<std::string>& getNamespaceNames() const { return _namespaceNames; }
 
-    void getSubNamespaceInfo(const std::string& subns, bool returnDescription=true, bool returnTags=true, bool returnNamespaces=true);
+    static void getSubNamespaceInfo(const std::string& path, Namespace& ns, Session& session, bool returnDescription=true, bool returnTags=true, bool returnNamespaces=true);
 
-    void getSecurity(security&, categories categ);
-    void setSecurity(security&, categories categ);
-    void Delete();
+    void getSecurity(security&, categories categ) { }
+    void setSecurity(security&, categories categ) { }
+    bool Delete();
     void updateDescription(const std::string &description);
     void create(const std::string& parentNs="");
     void setError(std::string err);
 	
-    const std::string& GetPath() const { return _nameChain; } 
+    const std::string& getPath() const { return _nameChain; } 
     
     bool isFresh() {
         return fresh;
@@ -91,6 +96,8 @@ protected:
 
     std::string _id;
     std::string _uri;
+	
+	static std::string gTemp;
 
     std::vector<std::string> _tagNames;
     std::vector<std::string> _namespaceNames;
@@ -99,6 +106,7 @@ protected:
 
     bool fresh;
     bool _nonexistent;
+	bool _nsNotEmpty;
 
 
     //callbacks
@@ -106,7 +114,11 @@ protected:
     static size_t FWgetSubNamespaceInfo(void *ptr, size_t size, size_t nmemb, void* p);
     static size_t FWupdateDescription(void *ptr, size_t size, size_t nmemb, void* p);
 	static size_t FWaddTag(void *ptr, size_t size, size_t nmemb, void* p);
+	static size_t FWdelete(void *obj);
 
+private:
+	char *bufferGetNsInfo_;
+	uint32_t idx_bufferGetNsInfo_;
 
 };
 

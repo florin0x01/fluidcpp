@@ -40,7 +40,7 @@ public:
 	void putTag(const std::string& tag, const std::string& tagPath, const std::string& value);
 	void put(const std::string& tag, const std::string& tagPath, const std::string& filePath);
 	
-	//void setError(std::string err);	
+	void setError(std::string err);	
 	
 	std::string getTagValue(std::string tag);
 	std::vector<std::string> getTagPaths(bool cached=false);

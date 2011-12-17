@@ -14,6 +14,13 @@ struct MetaObj: public SessionDetails
 }; 
 }
 
+void fluidinfo::Object::setError(string err)
+{
+    fluidinfo::SessionDetails::setError(err);
+	if (_err == "NonexistentTag" )
+		hasTagResponse_ = false;
+}
+
 fluidinfo::Object::~Object()
 {
 
@@ -51,7 +58,7 @@ bool fluidinfo::Object::hasTag(const std::string&id, const string& tag, Session&
   obj->setParentSession(&session);
   obj->init();
   obj->hasTagResponse_ = true;
-  session.RegisterCallback("NonexistentTag", FWhasTag, const_cast<Object*>(obj.get()));
+  //session.RegisterCallback("NonexistentTag", FWhasTag, const_cast<Object*>(obj.get()));
   obj->runCURL(HEAD, obj->mainURL + "/objects/" + id + "/" + tag, NULL, NULL);
   return obj->hasTagResponse_;
 }
