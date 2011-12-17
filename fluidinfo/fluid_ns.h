@@ -54,6 +54,8 @@ public:
 		_nameChain = parentSession->AuthObj.username;
     }
 
+	void setName(const std::string& name) { _name = name; }
+
     std::string getName() const {
         return _name;
     }
@@ -79,6 +81,7 @@ public:
     void create(const std::string& parentNs="");
     void setError(std::string err);
 	
+	void setPath(const std::string& path) { _nameChain = _nameChain + "/" + path; }
     const std::string& getPath() const { return _nameChain; } 
     
     bool isFresh() {

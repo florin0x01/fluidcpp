@@ -39,12 +39,12 @@ public:
 	
 	bool Indexed() { return indexed_ ; }
 	
-	static void Add(const Session& session, const std::string& nsPath, const std::string& name, 
+	static Ptr Add(const Session& session, const std::string& nsPath, const std::string& name, 
 					const std::string& description="", bool indexed=true);
-	static void UpdateDescription(const Session& session, const std::string& nsPath, const std::string& name, 
+	static Ptr UpdateDescription(const Session& session, const std::string& nsPath, const std::string& name, 
 					   const std::string& description);
 //	static void Update(const Tag& tag);
-	static void Delete(const Session& session, const std::string& nsPath, const std::string& name);
+	static Ptr Delete(const Session& session, const std::string& nsPath, const std::string& name);
 	
 	
 	static Ptr Get(const Session& session, const std::string& nsPath, const std::string& name);

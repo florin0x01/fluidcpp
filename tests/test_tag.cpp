@@ -1,4 +1,5 @@
 #include "fluid_tag.h"
+#include "fluid_ns.h"
 #include "fluid_session.h"
 #include "fluid_session_details.h"
 
@@ -36,7 +37,13 @@ int main(int argc, char** argv)
 {
     initSession(session, false, false);
 	
-	Tag::Add(session, "CPPNS1/CPPYA", "TestTag", "TestTag desc");
+	Tag::Ptr result =Tag::Add(session, "CPPNS1/CPPYA", "TestTag", "TestTag desc");
+	
+	if ( result->hasErrors() )
+	{
+		printVector<std::string>("Got the following errors:", result->getErrors());	
+	}
+	
 	Tag::UpdateDescription(session, "CPPNS1/CPPYA", "TestTag", "TestTag desc2");
 	//Tag::Delete(session, "CPPNS1/CPPYA", "TestTag");
 	
@@ -44,6 +51,17 @@ int main(int argc, char** argv)
 	std::cout << t->Description() << std::endl;
 	std::cout << t->Id() << std::endl;
 	std::cout << t->Indexed() << std::endl;
+	
+	std::cout << "=======================\n";
+	
+	Namespace::Ptr ns(new Namespace());
+	ns->setParentSession(&session);
+	ns->setPath("CPPNS1/CPPYA");
+	
+	Tag::Ptr t2 = Tag::Get(*ns, "TestTag");
+	std::cout << t2->Description() << std::endl;
+	std::cout << t2->Id() << std::endl;
+	std::cout << t2->Indexed() << std::endl;
 	
 	return 0;
 	

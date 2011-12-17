@@ -10,7 +10,7 @@ void Tag::setParentSession(Session* p)
   nameChain_ = "tags/" + parentSession->AuthObj.username + "/";
 }
 
-void Tag::Add(const Session& session, const std::string& nsPath, const std::string& name, 
+Tag::Ptr Tag::Add(const Session& session, const std::string& nsPath, const std::string& name, 
 			  const std::string& description, bool indexed)
 {
   Tag::ptr tag(new Tag());
@@ -25,9 +25,10 @@ void Tag::Add(const Session& session, const std::string& nsPath, const std::stri
  
   tag->runCURL(POST, tag->mainURL + "/tags/" + tag->parentSession->AuthObj.username + "/" + nsPath, 
 			   &root, FWAdd, const_cast<Tag*>(tag.get())); 
+  return tag;
 }
 
-void Tag::UpdateDescription(const Session& session, const std::string& nsPath, const std::string& name, const std::string& description)
+Tag::Ptr Tag::UpdateDescription(const Session& session, const std::string& nsPath, const std::string& name, const std::string& description)
 {
   Tag::ptr tag(new Tag());
   tag->setParentSession(const_cast<Session*>(&session));
@@ -38,15 +39,17 @@ void Tag::UpdateDescription(const Session& session, const std::string& nsPath, c
   
   tag->runCURL(PUT, tag->mainURL + "/tags/" + tag->parentSession->AuthObj.username + "/" + nsPath + "/" + name, 
 			   &root, FWUpdate, const_cast<Tag*>(tag.get()));
+  return tag;
 }
 
-void Tag::Delete(const Session& session, const std::string&nsPath, const std::string& name)
+Tag::Ptr Tag::Delete(const Session& session, const std::string&nsPath, const std::string& name)
 {
   Tag::ptr tag(new Tag());
   tag->setParentSession(const_cast<Session*>(&session));
   tag->init();
   tag->runCURL(DELETE, tag->mainURL + "/tags/" + tag->parentSession->AuthObj.username + "/" + nsPath + "/" + name, 
 			   NULL, FWDelete, const_cast<Tag*>(tag.get()) );
+  return tag;
 }
 
 Tag::Ptr Tag::Get(const Session& session, const std::string& nsPath, const std::string& name)
@@ -63,7 +66,13 @@ Tag::Ptr Tag::Get(const Session& session, const std::string& nsPath, const std::
 
 Tag::Ptr Tag::Get(const fluidinfo::Namespace& ns, const std::string& name)
 {
-	return Get(*ns.parentSession, ns.getPath(), name);
+  Tag::ptr tag(new Tag());
+  tag->setParentSession(ns.parentSession);
+  tag->init();
+  std::string url = tag->mainURL + "/tags/" + ns.getPath() + "/" + name;
+  url += "?returnDescription=True";
+  tag->runCURL(GET, url, NULL, FWGet, const_cast<Tag*>(tag.get())); 
+  return tag;
 }
 
 
