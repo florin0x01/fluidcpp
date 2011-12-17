@@ -92,14 +92,14 @@ int main(int argc, char** argv)
 		obj->clearErrors();
 	}
 	
-	std::string tag = "nfpetrovici/CPPTag1";
+	std::string tag = "user/Tag1";
 	
 	std::cout << " => Object has " << tag << ":" << Object::hasTag(obj->getId(), tag , session) << "\n";
 	
 		
 	std::cout << " => Object getIdsByQuery \n";
 	
-	std::vector<std::string> objs = Object::getIdsByQuery("has nfpetrovici/tags/Apple_Online_Store", session);	
+	std::vector<std::string> objs = Object::getIdsByQuery("has user/tag1", session);	
 	printVector<std::string>(objs);
 
 	std::vector<std::string> tagPaths;	
@@ -117,7 +117,7 @@ int main(int argc, char** argv)
 	std::cout << "Object about: " << resObject.getAbout() << "\n";
 	
 	
-	std::string tagValue = resObject.getTagValue("nfpetrovici/tags/Hot_News");
+	std::string tagValue = resObject.getTagValue("user/tag1");
 	
 	std::cout << "Tag value: " << tagValue << std::endl;
 	
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
 	
 	
 	std::cout << "Object::getById() " << std::endl;
-	Object::Ptr obj2 = Object::getById("695474d1-aa83-4252-a097-89ea355db241", session);
+	Object::Ptr obj2 = Object::getById("1", session);
 	std::cout << "About: " << obj2->getAbout() << std::endl;
 	
 	printVector<std::string>(obj2->getTagPaths());

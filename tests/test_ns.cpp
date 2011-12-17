@@ -70,15 +70,15 @@ int main(int argc, char** argv)
 	
 	
 
-	Namespace::getSubNamespaceInfo("/namespaces/nfpetrovici/CPPNS1", *ns, session);
+	Namespace::getSubNamespaceInfo("/namespaces/user_id/CPPNS1", *ns, session);
 	printVector<std::string>("Namespaces", ns->getNamespaceNames());
 	printVector<std::string>("Tags", ns->getTagNames());
 	
-	Namespace::getSubNamespaceInfo("/namespaces/nfpetrovici/tags", *ns, session);
+	Namespace::getSubNamespaceInfo("/namespaces/user_id/tags", *ns, session);
 	printVector<std::string>("Namespaces", ns->getNamespaceNames());
 	printVector<std::string>("Tags", ns->getTagNames());
 	
-	Namespace::getSubNamespaceInfo("/namespaces/nfpetrovici/users", *ns, session);
+	Namespace::getSubNamespaceInfo("/namespaces/user_id/users", *ns, session);
 	printVector<std::string>("Namespaces", ns->getNamespaceNames());
 	printVector<std::string>("Tags", ns->getTagNames());
 	
