@@ -1,3 +1,23 @@
+/* 
+Copyright 2011 Nicolae Florin Petrovici
+ 
+This file is part of the Fluidinfo C++ library. 
+For more information, regarding Fluidinfo, visit http://www.fluidinfo.com
+
+Fluidinfo C++ library is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Fluidinfo C++ library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Fluidinfo C++ library.  If not, see <http://www.gnu.org/licenses/>.
+*/  
+
 #ifndef _GENERIC_STUFF
 #define _GENERIC_STUFF
 
@@ -45,7 +65,6 @@ struct auto_vec{
   T_* get() const { return t_; }
   T_* operator->() const { return get(); }
   T_& operator*() const { return *get(); }
-  /* you should also define operator=, reset and release, if you plan to use them */
 };
 
 //based on javascript encodeURIComponent()
